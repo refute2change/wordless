@@ -5,8 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <string>
-#include <direct.h>
-#include <fileapi.h>
+
 
 class interface
 {

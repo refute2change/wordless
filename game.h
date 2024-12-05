@@ -85,6 +85,10 @@ public:
 	int getfinishedtime();
 	std::vector<std::string> getanswers();
 	std::string getanswer();
+	virtual void setShift(int)
+	{
+
+	}
 	const bool isHit(sf::RenderWindow&);
 };
 
@@ -124,6 +128,7 @@ public:
 class shiftedGame: virtual public game
 {
 private:
+	
 	int shift = 0;
 public:
 	shiftedGame(): game(){}
@@ -141,26 +146,27 @@ public:
 	}
 };
 
-// class hardshiftedGame: public hardGame, public shiftedGame
-// {
-// public:
-// 	hardshiftedGame(): hardGame(), shiftedGame(){}
-// 	hardshiftedGame(std::string answer, int shift): hardGame(answer){setShift(shift);}
-// 	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): hardGame(answer, guesses, started, turns){setShift(charShift);}
-// 	~hardshiftedGame(){}
-// 	int getShift() override
-// 	{
-// 		return shiftedGame::getShift();
-// 	}
-// 	void insertcharacter(char ch) override
-// 	{
-// 		shiftedGame::insertcharacter(ch);
-// 	}
-// 	void enterevent() override
-// 	{
-// 		hardGame::enterevent();
-// 	}
-// };
+class hardshiftedGame: virtual public game
+{
+private:
+	std::vector<bool> fixedcharacters;
+	std::map<char, int> neededcharacters, notchecked;
+	int shift = 0;
+public:
+	hardshiftedGame(): game(){}
+	hardshiftedGame(std::string answer, int shift): game(answer){this->shift = shift;fixedcharacters.resize(getlength(), false);}
+	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): game(answer, guesses, started, turns){this->shift = charShift;fixedcharacters.resize(getlength(), false);}
+	~hardshiftedGame(){}
+	//shiftedGame conponents
+	int getShift() override
+	{
+		return shift;
+	}
+	void insertcharacter(char ch) override;
+	//hardGame components
+	void enterevent() override;
+	bool validcheck();
+};
 
 class drawer
 {

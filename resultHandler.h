@@ -4,12 +4,14 @@
 #include <SFML/Graphics.hpp>
 #include <filesystem>
 #include <sys/stat.h>
+#include <direct.h>
+#include <fileapi.h>
 
 class resultHandler
 {
 private:
 	time_t timestamp;
-	time_t start;
+	time_t start = 0;
 	int detention[20] = { 10, 15, 20, 30, 60, 90, 120, 150, 200, 300, 450, 600, 750, 900, 1200, 1500, 1800, 2400, 3600, 7200 };
 	std::ofstream f;
 	int at;

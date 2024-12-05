@@ -21,19 +21,19 @@ interface::interface()
 	resigned = false;
 	finished = true;
 	detention = true;
-	struct stat sb;
-	if (stat("C:/Wordless", &sb) != 0)
-	{
-		std::filesystem::create_directories("C:/Wordless");
-		SetFileAttributesA("C:/Wordless", FILE_ATTRIBUTE_HIDDEN);
-		std::ofstream fa, fb;
-		fa.open("C:/Wordless/gamedata.txt");
-		fb.open("C:/Wordless/unfinishedgame.txt");
-		fa << 0 << '\n' << 0;
-		fb << 0;
-		fa.close();
-		fb.close();
-	}
+	// struct stat sb;
+	// if (stat("C:/Wordless", &sb) != 0)
+	// {
+	// 	std::filesystem::create_directories("C:/Wordless");
+	// 	SetFileAttributesA("C:/Wordless", FILE_ATTRIBUTE_HIDDEN);
+	// 	std::ofstream fa, fb;
+	// 	fa.open("C:/Wordless/gamedata.txt");
+	// 	fb.open("C:/Wordless/unfinishedgame.txt");
+	// 	fa << 0 << '\n' << 0;
+	// 	fb << 0;
+	// 	fa.close();
+	// 	fb.close();
+	// }
 	readgame();
 	res = 0;
 	if (handler.remainingtime() == 0) resetavailable = true;
@@ -63,7 +63,7 @@ void interface::readgame()
 		finished = false;
 		detention = false;
 		history >> mode;
-		if (mode == 2) history >> shift;
+		if (mode == 2 || mode == 3) history >> shift;
 		modes.push_back(mode);
 		history >> started >> turns;
 		std::getline(history, temp);
@@ -77,7 +77,7 @@ void interface::readgame()
 		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
-		// else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
+		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
 		gamez.push_back(gamePtr);
 		// gamez.push_back(game(temp, previousanswers, started, turns));
@@ -100,7 +100,7 @@ void interface::generate()
 	words = g.generator();
 	for (int i = 0; i < 6; i++)
 	{
-		mode = (rand() % 3);
+		mode = (rand() % 4);
 		if (mode == 0) gamePtr = new normalGame(words[i]);
 		else if (mode == 1) gamePtr = new hardGame(words[i]);
 		else if (mode == 2)
@@ -109,12 +109,12 @@ void interface::generate()
 			while (shift == 0) shift = (rand() % 51) - 25;
 			gamePtr = new shiftedGame(words[i], shift);
 		}
-		// else if (mode == 3)
-		// {
-		// 	shift = 0;
-		// 	while (shift == 0) shift = (rand() % 51) - 25;
-		// 	gamePtr = new hardshiftedGame(words[i], shift);
-		// }
+		else if (mode == 3)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new hardshiftedGame(words[i], shift);
+		}
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);
 		gamez.push_back(gamePtr);
@@ -420,7 +420,7 @@ void interface::savegame()
 			if (modes[i] == 0) history << "\n";
 			else if (modes[i] == 1) history << "\n";
 			else if (modes[i] == 2) history << " " << gamez[i]->getShift() << "\n";
-			// else if (modes[i] == 3) history << " " << gamez[i]->getShift() << "\n";
+			else if (modes[i] == 3) history << " " << gamez[i]->getShift() << "\n";
 			history << gamez[i]->begin << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';

@@ -1,5 +1,10 @@
 #include "game.h"
 
+game::game()
+{
+
+}
+
 game::game(std::string word)
 {
 	answer = word;
@@ -537,4 +542,58 @@ void hardGame::enterevent()
 void hardGame::insertcharacter(char ch)
 {
 	addcharacter(ch);
+}
+
+void hardshiftedGame::insertcharacter(char ch)
+{
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void hardshiftedGame::enterevent()
+{
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+}
+
+bool hardshiftedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
 }
