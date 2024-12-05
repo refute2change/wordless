@@ -90,12 +90,14 @@ game::game(std::string word, std::vector<std::string> guessessofar, bool started
 	}
 }
 
+//add a charracter to active guess
 void game::addcharacter(char ch)
 {
 	if (guesses[turn].length() < length) guesses[turn] += ch;
 	if (!begin) begin = true;
 }
 
+//remove a char from current guess
 void game::removecharacter()
 {
 	if (guesses[turn].length() != 0)
@@ -105,6 +107,7 @@ void game::removecharacter()
 	}
 }
 
+//check for valid guess
 bool game::existcheck()
 {
 	availableanswers.clear();
@@ -117,6 +120,7 @@ bool game::existcheck()
 	return false;
 }
 
+//invoked when press enter
 void game::enterevent()
 {
 	if (turn == 6) return;
@@ -124,19 +128,18 @@ void game::enterevent()
 	if (guesses[turn].length() != length) return;
 	for (int i = 0; i < turn; i++) if (guesses[turn] == guesses[i])
 	{
-		messagetime = clock();
 		messagetype = 2;
 		return;
 	}
 	if (!existcheck())
 	{
-		messagetime = clock();
 		messagetype = 1;
 		return;
 	}
 	checkguess();
 }
 
+//after valid check, this is called to check for the result of the guess
 void game::checkguess()
 {
 	guessesmap.clear();
@@ -160,6 +163,7 @@ void game::checkguess()
 	flipstate();
 }
 
+//flip state of game once game is over
 const void game::flipstate()
 {
 	time(&timestamp);
@@ -172,6 +176,7 @@ const void game::flipstate()
 	}
 }
 
+//result fetch
 const int game::result()
 {
 	if (turn == 0) return 0;
@@ -186,27 +191,32 @@ const int game::result()
 	return 0;
 }
 
+
 int game::getfinishedtime()
 {
 	return finishedtime;
 }
 
+//get list of guesses
 std::vector<std::string> game::getanswers()
 {
 	return guesses;
 }
 
+//answer of game
 std::string game::getanswer()
 {
 	return answer;
 }
 
+//state button check
 const bool game::isHit(sf::RenderWindow& w)
 {
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) return false;
 	int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
 	return (x >= gameblock.getPosition().x && y >= gameblock.getPosition().y && x < gameblock.getPosition().x + gameblock.getSize().x && y < gameblock.getPosition().y + gameblock.getSize().y);
 }
+
 
 drawer::drawer()
 {
@@ -477,6 +487,51 @@ void shiftedGame::insertcharacter(char ch)
 	ch = ch % 26;
 	ch += 97;
 	addcharacter(ch);
+}
+
+bool hardGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardGame::enterevent()
+{
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
 }
 
 void hardGame::insertcharacter(char ch)

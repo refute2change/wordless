@@ -75,6 +75,7 @@ void interface::readgame()
 			previousanswers.push_back(inputstrings);
 		}
 		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, turns);
+		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
 		gamez.push_back(gamePtr);
@@ -98,8 +99,9 @@ void interface::generate()
 	words = g.generator();
 	for (int i = 0; i < 6; i++)
 	{
-		mode = (rand() % 2) * 2;
+		mode = (rand() % 3);
 		if (mode == 0) gamePtr = new normalGame(words[i]);
+		else if (mode == 1) gamePtr = new hardGame(words[i]);
 		else if (mode == 2)
 		{
 			shift = 0;
@@ -410,6 +412,7 @@ void interface::savegame()
 		{
 			history << modes[i];
 			if (modes[i] == 0) history << "\n";
+			else if (modes[i] == 1) history << "\n";
 			else if (modes[i] == 2) history << " " << gamez[i]->getShift() << "\n";
 			history << gamez[i]->begin << '\n';
 			history << gamez[i]->turn << '\n';

@@ -64,6 +64,10 @@ public:
 	{
 		return messagetype;
 	}
+	void setmessagestate(int state)
+	{
+		messagetype = state;
+	}
 	void clearmessagestate()
 	{
 		messagetype = 0;
@@ -72,7 +76,7 @@ public:
 	virtual void insertcharacter(char) = 0;
 	void addcharacter(char);
 	void removecharacter();
-	void enterevent();
+	virtual void enterevent();
 	void checkguess();
 	bool existcheck();
 	const int result();
@@ -86,10 +90,15 @@ public:
 class hardGame: public game
 {
 private:
-	bool fixedcharacters[5]{false};
-	std::map<char, int> neededcharacters;
+	std::vector<bool> fixedcharacters;
+	std::map<char, int> neededcharacters, notchecked;
 public:
+	hardGame(): game(){}
+	hardGame(std::string answer): game(answer){fixedcharacters.resize(getlength(), false);}
+	hardGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns){fixedcharacters.resize(getlength(), false);}
 	void insertcharacter(char) override;
+	bool validcheck();
+	void enterevent() override;
 	int getShift() override
 	{
 		return 0;
