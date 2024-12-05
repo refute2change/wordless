@@ -98,9 +98,12 @@ void interface::generate()
 	finished = true;
 	detention = false;
 	words = g.generator();
+	std::random_device dev;
+    std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist1(0, 3);
 	for (int i = 0; i < 6; i++)
 	{
-		mode = (rand() % 4);
+		mode = dist1(rng);
 		if (mode == 0) gamePtr = new normalGame(words[i]);
 		else if (mode == 1) gamePtr = new hardGame(words[i]);
 		else if (mode == 2)

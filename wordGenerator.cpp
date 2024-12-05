@@ -15,7 +15,15 @@ std::vector<std::string> wordGenerator::generator()
 	std::vector<std::string> data;
 	data.resize(6);
 	int places[6];
-	for (int i = 0; i < 6; i++) places[i] = rand() % length[i];
+	std::random_device dev;
+    std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist1(0, length[0] - 1), dist2(0,length[1] - 1), dist3(0, length[2] - 1), dist4(0, length[3] - 1), dist5(0, length[4] - 1), dist6(0,length[5] - 1);
+	places[0] = dist1(rng);
+	places[1] = dist2(rng);
+	places[2] = dist3(rng);
+	places[3] = dist4(rng);
+	places[4] = dist5(rng);
+	places[5] = dist6(rng);
 	f3.clear();
 	f4.clear();
 	f5.clear();
