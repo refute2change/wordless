@@ -77,6 +77,7 @@ void interface::readgame()
 		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
+		// else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
 		gamez.push_back(gamePtr);
 		// gamez.push_back(game(temp, previousanswers, started, turns));
@@ -108,6 +109,12 @@ void interface::generate()
 			while (shift == 0) shift = (rand() % 51) - 25;
 			gamePtr = new shiftedGame(words[i], shift);
 		}
+		// else if (mode == 3)
+		// {
+		// 	shift = 0;
+		// 	while (shift == 0) shift = (rand() % 51) - 25;
+		// 	gamePtr = new hardshiftedGame(words[i], shift);
+		// }
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);
 		gamez.push_back(gamePtr);
@@ -271,7 +278,6 @@ void interface::reset()
 		gamez.clear();
 		modes.clear();
 		generate();
-		//resignavailable = false;
 		resigned = false;
 		resetavailable = false;
 		resignavailable = true;
@@ -414,6 +420,7 @@ void interface::savegame()
 			if (modes[i] == 0) history << "\n";
 			else if (modes[i] == 1) history << "\n";
 			else if (modes[i] == 2) history << " " << gamez[i]->getShift() << "\n";
+			// else if (modes[i] == 3) history << " " << gamez[i]->getShift() << "\n";
 			history << gamez[i]->begin << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
