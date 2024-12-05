@@ -269,13 +269,13 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(178 + 50 * x, 600);
+		characterblock.setPosition(150 + 50 * x, 590);
 		text.setFont(font);
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(200 + 50 * x, 622);
+		text.setPosition(172 + 50 * x, 612);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
@@ -298,13 +298,13 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(193 + 50 * x, 650);
+		characterblock.setPosition(165 + 50 * x, 640);
 		text.setFont(font);
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(215 + 50 * x, 672);
+		text.setPosition(187 + 50 * x, 662);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
@@ -327,13 +327,13 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(223 + 50 * x, 700);
+		characterblock.setPosition(195 + 50 * x, 690);
 		text.setFont(font);
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(245 + 50 * x, 722);
+		text.setPosition(217 + 50 * x, 712);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
