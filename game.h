@@ -159,6 +159,17 @@ public:
 	}
 };
 
+class timedGame: virtual public game
+{
+private:
+	int remainingtime;
+public:
+	timedGame(): game(){}
+	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime){}
+	timedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime): game(answer, guesses, started, turns), remainingtime(allowedtime){}
+	~timedGame(){}
+};
+
 class hardshiftedGame: virtual public game
 {
 private:
