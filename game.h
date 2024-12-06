@@ -99,8 +99,21 @@ private:
 	std::map<char, int> neededcharacters, notchecked;
 public:
 	hardGame(): game(){}
-	hardGame(std::string answer): game(answer){fixedcharacters.resize(getlength(), false);}
-	hardGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns){fixedcharacters.resize(getlength(), false);}
+	hardGame(std::string answer): game(answer)
+	{
+		fixedcharacters.resize(getlength(), false);
+	}
+	hardGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns)
+	{
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+	}
 	~hardGame(){}
 	void insertcharacter(char) override;
 	bool validcheck();
@@ -154,8 +167,23 @@ private:
 	int shift = 0;
 public:
 	hardshiftedGame(): game(){}
-	hardshiftedGame(std::string answer, int shift): game(answer){this->shift = shift;fixedcharacters.resize(getlength(), false);}
-	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): game(answer, guesses, started, turns){this->shift = charShift;fixedcharacters.resize(getlength(), false);}
+	hardshiftedGame(std::string answer, int shift): game(answer)
+	{
+		this->shift = shift;
+		fixedcharacters.resize(getlength(), false);
+	}
+	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): game(answer, guesses, started, turns)
+	{
+		this->shift = charShift;
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+	}
 	~hardshiftedGame(){}
 	//shiftedGame conponents
 	int getShift() override
