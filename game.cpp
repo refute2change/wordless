@@ -544,6 +544,51 @@ void hardGame::insertcharacter(char ch)
 	addcharacter(ch);
 }
 
+void timedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		begin = true;
+		starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0) flipstate();
+	starttimer = temp;
+}
+
+void timedGame::turnontimer()
+{
+	if (!active) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void timedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void timedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int timedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
 void hardshiftedGame::insertcharacter(char ch)
 {
 	ch -= 97;

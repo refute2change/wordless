@@ -73,14 +73,35 @@ public:
 	{
 		messagetype = 0;
 	}
-	virtual int getShift() = 0;	
+	virtual int getShift() = 0;
+	virtual int getremainingtime()
+	{
+		return 0;
+	}
+	virtual int getmaxtime()
+	{
+		return 0;
+	}
+	virtual void turnontimer()
+	{
+
+	}
+	virtual void permanentturnoff()
+	{
+
+	}
+	virtual void turnofftimer()
+	{
+
+	}
 	virtual void insertcharacter(char) = 0;
+	virtual void updateremainingtime(){}
 	void addcharacter(char);
 	void removecharacter();
 	virtual void enterevent();
 	void checkguess();
 	bool existcheck();
-	const int result();
+	virtual const int result();
 	const void flipstate();
 	int getfinishedtime();
 	std::vector<std::string> getanswers();
@@ -162,11 +183,41 @@ public:
 class timedGame: virtual public game
 {
 private:
-	int remainingtime;
+	int remainingtime, starttimer = 0, maxtime;
+	bool active = true;
 public:
 	timedGame(): game(){}
-	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime){}
-	timedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime): game(answer, guesses, started, turns), remainingtime(allowedtime){}
+	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime){}
+	timedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, turns), remainingtime(remainingtime), maxtime(allowedtime)
+	{
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
+	void updateremainingtime() override;
+	int getremainingtime() override
+	{
+		return remainingtime;
+	}
+	int getmaxtime() override
+	{
+		return maxtime;
+	}
+	void turnontimer() override;
+	void turnofftimer() override;
+	void permanentturnoff() override;
+	const int result() override;
+	
+	void insertcharacter(char ch) override
+	{
+		addcharacter(ch);
+	}
+	int getShift() override
+	{
+		return 0;
+	}
 	~timedGame(){}
 };
 
