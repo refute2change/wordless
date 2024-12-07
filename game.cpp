@@ -259,6 +259,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : top)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -288,6 +292,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : mid)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -305,6 +313,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 		}
 		characterblock.setPosition(165 + 50 * x, 640);
 		text.setFont(font);
+		
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
@@ -317,6 +326,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : bot)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -334,6 +347,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 		}
 		characterblock.setPosition(195 + 50 * x, 690);
 		text.setFont(font);
+		
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
