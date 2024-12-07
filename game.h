@@ -407,13 +407,21 @@ private:
 	bool active = true;
 public:
 	hardshiftedtimedGame(): game(){}
-	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){}
+	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){fixedcharacters.resize(getlength());}
 	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
 		if (result() != 0)
 		{
 			flipstate();
 			permanentturnoff();
+		}
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
 		}
 	}
 	//hardGame components

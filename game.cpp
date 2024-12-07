@@ -863,11 +863,6 @@ bool hardshiftedtimedGame::validcheck()
 
 void hardshiftedtimedGame::enterevent()
 {
-	if (!begin)
-	{
-		begin = true;
-		turnontimer();
-	}
 	if (turn == 6) return;
 	if (result() != 0) return;
 	if (getguess(turn).length() != getlength()) return;
