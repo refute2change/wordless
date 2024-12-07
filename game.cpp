@@ -667,3 +667,282 @@ bool hardshiftedGame::validcheck()
 	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
 	return true;
 }
+
+bool hardtimedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardtimedGame::enterevent()
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+}
+
+void hardtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;
+}
+
+void hardtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void hardtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void hardtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int hardtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
+void shiftedtimedGame::insertcharacter(char ch)
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void shiftedtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;
+}
+
+void shiftedtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void shiftedtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void shiftedtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int shiftedtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
+bool hardshiftedtimedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardshiftedtimedGame::enterevent()
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+
+}
+
+void hardshiftedtimedGame::insertcharacter(char ch)
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void hardshiftedtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;	
+}
+
+void hardshiftedtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void hardshiftedtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void hardshiftedtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int hardshiftedtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}

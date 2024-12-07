@@ -114,6 +114,20 @@ public:
 	const bool isHit(sf::RenderWindow&);
 };
 
+class normalGame: virtual public game
+{
+public:
+	normalGame(): game(){}
+	normalGame(std::string answer): game(answer){}
+	normalGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns){}
+	~normalGame(){}
+	void insertcharacter(char) override;
+	int getShift() override
+	{
+		return 0;
+	}
+};
+
 class hardGame: virtual public game
 {
 private:
@@ -146,24 +160,9 @@ public:
 	}
 };
 
-class normalGame: virtual public game
-{
-public:
-	normalGame(): game(){}
-	normalGame(std::string answer): game(answer){}
-	normalGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns){}
-	~normalGame(){}
-	void insertcharacter(char) override;
-	int getShift() override
-	{
-		return 0;
-	}
-};
-
 class shiftedGame: virtual public game
 {
 private:
-	
 	int shift = 0;
 public:
 	shiftedGame(): game(){}
@@ -196,6 +195,7 @@ public:
 			flipstate();
 			permanentturnoff();
 		}
+
 	}
 	void updateremainingtime() override;
 	int getremainingtime() override
@@ -270,6 +270,189 @@ public:
 	//hardGame components
 	void enterevent() override;
 	bool validcheck();
+};
+
+class hardtimedGame: virtual public game
+{
+private:
+	std::vector<bool> fixedcharacters;
+	std::map<char, int> neededcharacters, notchecked;
+	int remainingtime, starttimer = 0, maxtime;
+	bool active = true;
+public:
+	hardtimedGame(): game(){}
+	hardtimedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime)
+	{
+		fixedcharacters.resize(getlength(), false);
+	}
+	hardtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, turns), maxtime(allowedtime), remainingtime(allowedtime)
+	{
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
+	~hardtimedGame(){}
+	//hardGame components
+	bool validcheck();
+	void enterevent() override;
+	int getShift() override
+	{
+		return 0;
+	}
+	//timedGame components
+	void updateremainingtime() override;
+	int getremainingtime() override
+	{
+		return remainingtime;
+	}
+	int getmaxtime() override
+	{
+		return maxtime;
+	}
+	void turnontimer() override;
+	void turnofftimer() override;
+	void permanentturnoff() override;
+	const int result() override;
+	void insertcharacter(char ch) override
+	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
+		addcharacter(ch);
+	}
+	void removecharacter() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
+		game::removecharacter();
+	}	
+};
+
+class shiftedtimedGame: virtual public game
+{
+private:
+	int shift = 0;
+	int remainingtime, starttimer = 0, maxtime;
+	bool active = true;
+public:
+	shiftedtimedGame(): game(){}
+	shiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime), shift(charShift){}
+	shiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	{
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
+	~shiftedtimedGame(){}
+	//shiftedGame components
+	void insertcharacter(char) override;
+	int getShift() override
+	{
+		return shift;
+	}
+	void setShift(int newShift)
+	{
+		shift = newShift;
+	}
+	//timedGame components
+	void updateremainingtime() override;
+	int getremainingtime() override
+	{
+		return remainingtime;
+	}
+	int getmaxtime() override
+	{
+		return maxtime;
+	}
+	void turnontimer() override;
+	void turnofftimer() override;
+	void permanentturnoff() override;
+	const int result() override;
+	void removecharacter() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
+		game::removecharacter();
+	}
+	
+};
+
+class hardshiftedtimedGame: virtual public game
+{
+private:
+	std::vector<bool> fixedcharacters;
+	std::map<char, int> neededcharacters, notchecked;
+	int shift = 0;
+	int remainingtime, starttimer = 0, maxtime;
+	bool active = true;
+public:
+	hardshiftedtimedGame(): game(){}
+	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){}
+	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	{
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
+	//hardGame components
+	bool validcheck();
+	void enterevent() override;
+	//shiftedGame components
+	void insertcharacter(char) override;
+	int getShift() override
+	{
+		return shift;
+	}
+	void setShift(int newShift)
+	{
+		shift = newShift;
+	}
+	//timedGame components
+	void updateremainingtime() override;
+	int getremainingtime() override
+	{
+		return remainingtime;
+	}
+	int getmaxtime() override
+	{
+		return maxtime;
+	}
+	void turnontimer() override;
+	void turnofftimer() override;
+	void permanentturnoff() override;
+	const int result() override;
+	void removecharacter() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
+		game::removecharacter();
+	}
+	~hardshiftedtimedGame(){}
 };
 
 class drawer

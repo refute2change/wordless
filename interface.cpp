@@ -64,7 +64,8 @@ void interface::readgame()
 		detention = false;
 		history >> mode;
 		if (mode == 2 || mode == 3) history >> shift;
-		else if (mode == 4) history >> allowedtime >> remainingtime;
+		else if (mode == 4 || mode == 5) history >> allowedtime >> remainingtime;
+		else if (mode == 6 || mode == 7) history >> shift >> allowedtime >> remainingtime;
 		modes.push_back(mode);
 		history >> started >> turns;
 		std::getline(history, temp);
@@ -82,6 +83,21 @@ void interface::readgame()
 		else if (modes[i] == 4) 
 		{
 			gamePtr = new timedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 5)
+		{
+			gamePtr = new hardtimedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 6)
+		{
+			gamePtr = new shiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 7)
+		{
+			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
@@ -106,7 +122,7 @@ void interface::generate()
 	words = g.generator();
 	std::random_device dev;
     std::mt19937 rng(dev());
-	std::uniform_int_distribution<std::mt19937::result_type> dist1(0, 4);
+	std::uniform_int_distribution<std::mt19937::result_type> dist1(0, 7);
 	for (int i = 0; i < 6; i++)
 	{
 		mode = dist1(rng);
@@ -126,7 +142,23 @@ void interface::generate()
 		}
 		else if (mode == 4)
 		{
-			gamePtr = new timedGame(words[i], 150 * 1000);
+			gamePtr = new timedGame(words[i], 90 * 1000);
+		}
+		else if (mode == 5)
+		{
+			gamePtr = new hardtimedGame(words[i], 150 * 1000);
+		}
+		else if (mode == 6)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new shiftedtimedGame(words[i], shift, 120 * 1000);
+		}
+		else if (mode == 7)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new hardshiftedtimedGame(words[i], shift, 180 * 1000);
 		}
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);
@@ -443,6 +475,9 @@ void interface::savegame()
 			else if (modes[i] == 2) history << " " << gamez[i]->getShift() << "\n";
 			else if (modes[i] == 3) history << " " << gamez[i]->getShift() << "\n";
 			else if (modes[i] == 4) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			history << gamez[i]->begin << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
