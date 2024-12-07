@@ -142,23 +142,23 @@ void interface::generate()
 		}
 		else if (mode == 4)
 		{
-			gamePtr = new timedGame(words[i], 90 * 1000);
+			gamePtr = new timedGame(words[i], 45 * 1000);
 		}
 		else if (mode == 5)
 		{
-			gamePtr = new hardtimedGame(words[i], 150 * 1000);
+			gamePtr = new hardtimedGame(words[i], 75 * 1000);
 		}
 		else if (mode == 6)
 		{
 			shift = 0;
 			while (shift == 0) shift = (rand() % 51) - 25;
-			gamePtr = new shiftedtimedGame(words[i], shift, 120 * 1000);
+			gamePtr = new shiftedtimedGame(words[i], shift, 60 * 1000);
 		}
 		else if (mode == 7)
 		{
 			shift = 0;
 			while (shift == 0) shift = (rand() % 51) - 25;
-			gamePtr = new hardshiftedtimedGame(words[i], shift, 180 * 1000);
+			gamePtr = new hardshiftedtimedGame(words[i], shift, 90 * 1000);
 		}
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);
