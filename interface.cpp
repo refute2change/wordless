@@ -79,7 +79,11 @@ void interface::readgame()
 		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
 		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
-		else if (modes[i] == 4) gamePtr = new timedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+		else if (modes[i] == 4) 
+		{
+			gamePtr = new timedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
 		gamez.push_back(gamePtr);
 		// gamez.push_back(game(temp, previousanswers, started, turns));
@@ -122,7 +126,7 @@ void interface::generate()
 		}
 		else if (mode == 4)
 		{
-			gamePtr = new timedGame(words[i], 6 * 1000);
+			gamePtr = new timedGame(words[i], 150 * 1000);
 		}
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);

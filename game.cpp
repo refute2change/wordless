@@ -347,16 +347,35 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
+	// std::string temp = std::to_string(g->getremainingtime());
 	std::string temp = std::to_string(g->getlength()) + " letters";
 	text.setFont(font);
 	text.setString(temp);
 	text.setCharacterSize(45);
 	text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
 	text.setPosition(898, 187 + 100 * (g->getlength() - 3));
+	if (g->getmaxtime() != 0 && g->result() == 0)
+	{
+		gameblock.setTexture(gamefailed);
+		gameblock.setScale(sf::Vector2f(1.0, 1.0));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+		w.draw(gameblock);
+	}
+	
 	if (atgame == g->getlength() - 3) gameblock.setTexture(gameactive);
 	else if (!g->result()) gameblock.setTexture(gamenotstarted);
 	else if (g->result() == -1) gameblock.setTexture(gamefailed);
 	else gameblock.setTexture(gamewon);
+	if (g->getmaxtime() != 0 && g->result() == 0)
+	{
+		float scale = (float)g->getremainingtime() / g->getmaxtime();
+		gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+		w.draw(gameblock);
+		w.draw(text);
+		return;
+	}
+	gameblock.setScale(sf::Vector2f(1.0, 1.0));
 	gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
 	w.draw(gameblock);
 	w.draw(text);
@@ -541,6 +560,7 @@ void hardGame::enterevent()
 
 void hardGame::insertcharacter(char ch)
 {
+	if (!begin) turnontimer();
 	addcharacter(ch);
 }
 
@@ -549,21 +569,26 @@ void timedGame::updateremainingtime()
 	if (result() != 0) return;
 	if (!begin)
 	{
-		begin = true;
-		starttimer = clock();
+		// begin = true;
+		// starttimer = clock();
 		return;
 	}
 	if (remainingtime <= 0) return;
 	int temp = clock();
 	if (!starttimer) return;
 	remainingtime -= temp - starttimer;
-	if (remainingtime <= 0) flipstate();
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
 	starttimer = temp;
 }
 
 void timedGame::turnontimer()
 {
 	if (!active) return;
+	if (!begin) return;
 	if (!starttimer) starttimer = clock();
 }
 

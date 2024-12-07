@@ -6,6 +6,7 @@
 #include <map>
 #include <ctime>
 #include <fstream>
+#include <cmath>
 
 class game
 {
@@ -97,7 +98,7 @@ public:
 	virtual void insertcharacter(char) = 0;
 	virtual void updateremainingtime(){}
 	void addcharacter(char);
-	void removecharacter();
+	virtual void removecharacter();
 	virtual void enterevent();
 	void checkguess();
 	bool existcheck();
@@ -209,10 +210,23 @@ public:
 	void turnofftimer() override;
 	void permanentturnoff() override;
 	const int result() override;
-	
 	void insertcharacter(char ch) override
 	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
 		addcharacter(ch);
+	}
+	void removecharacter() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			turnontimer();
+		}
+		game::removecharacter();
 	}
 	int getShift() override
 	{
