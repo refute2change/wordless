@@ -41,7 +41,7 @@ interface::interface()
 
 void interface::readgame()
 {
-	bool started;
+	bool started, switchedoff;
 	int turns, mode, shift, allowedtime, remainingtime;
 	game* gamePtr = nullptr;
 	std::ifstream history("C:/Wordless/unfinishedgame.txt");
@@ -67,7 +67,7 @@ void interface::readgame()
 		else if (mode == 4 || mode == 5) history >> allowedtime >> remainingtime;
 		else if (mode == 6 || mode == 7) history >> shift >> allowedtime >> remainingtime;
 		modes.push_back(mode);
-		history >> started >> turns;
+		history >> started >> switchedoff >> turns;
 		std::getline(history, temp);
 		std::getline(history, temp);
 		previousanswers.clear();
@@ -76,28 +76,28 @@ void interface::readgame()
 			std::getline(history, inputstrings);
 			previousanswers.push_back(inputstrings);
 		}
-		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, turns);
-		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
-		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
-		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
+		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, switchedoff, turns);
+		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, switchedoff, turns);
+		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, switchedoff, turns, shift);
+		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, switchedoff, turns, shift);
 		else if (modes[i] == 4) 
 		{
-			gamePtr = new timedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr = new timedGame(temp, previousanswers, started, switchedoff, turns, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 5)
 		{
-			gamePtr = new hardtimedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr = new hardtimedGame(temp, previousanswers, started, switchedoff, turns, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 6)
 		{
-			gamePtr = new shiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
+			gamePtr = new shiftedtimedGame(temp, previousanswers, started, switchedoff, turns, shift, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 7)
 		{
-			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
+			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, switchedoff, turns, shift, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
@@ -205,6 +205,7 @@ void interface::operate()
 						{
 							if (active == i) continue;
 							gamez[active]->turnofftimer();
+							gamez[active]->quit();
 							gamez[i]->turnontimer();
 							active = i;
 						}
@@ -478,7 +479,7 @@ void interface::savegame()
 			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
-			history << gamez[i]->begin << '\n';
+			history << gamez[i]->begin << " " << gamez[i]->switchedoff << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
 			std::vector<std::string> answers = gamez[i]->getanswers();

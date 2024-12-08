@@ -26,9 +26,10 @@ private:
 public:
 	int turn = 0;
 	bool begin = false;
+	bool switchedoff = false;
 	game();
 	game(std::string);
-	game(std::string, std::vector <std::string>, bool, int);
+	game(std::string, std::vector <std::string>, bool, bool, int);
 	virtual ~game(){}
 	std::string getdisplaystring()
 	{
@@ -106,6 +107,7 @@ public:
 	const void flipstate();
 	int getfinishedtime();
 	std::vector<std::string> getanswers();
+	void quit();
 	std::string getanswer();
 	virtual void setShift(int)
 	{
@@ -119,7 +121,7 @@ class normalGame: virtual public game
 public:
 	normalGame(): game(){}
 	normalGame(std::string answer): game(answer){}
-	normalGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns){}
+	normalGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns): game(answer, guesses, started, off, turns){}
 	~normalGame(){}
 	void insertcharacter(char) override;
 	int getShift() override
@@ -139,7 +141,7 @@ public:
 	{
 		fixedcharacters.resize(getlength(), false);
 	}
-	hardGame(std::string answer, std::vector <std::string> guesses, bool started, int turns): game(answer, guesses, started, turns)
+	hardGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns): game(answer, guesses, started, off, turns)
 	{
 		fixedcharacters.resize(getlength(), false);
 		if (turn == 0) return;
@@ -167,7 +169,7 @@ private:
 public:
 	shiftedGame(): game(){}
 	shiftedGame(std::string answer, int charShift): game(answer), shift(charShift){}
-	shiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): game(answer, guesses, started, turns), shift(charShift){}
+	shiftedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift): game(answer, guesses, started, off, turns), shift(charShift){}
 	~shiftedGame(){}
 	void insertcharacter(char) override;
 	int getShift() override
@@ -188,7 +190,7 @@ private:
 public:
 	timedGame(): game(){}
 	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime){}
-	timedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, turns), remainingtime(remainingtime), maxtime(allowedtime)
+	timedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, turns), remainingtime(remainingtime), maxtime(allowedtime)
 	{
 		if (result() != 0)
 		{
@@ -248,7 +250,7 @@ public:
 		this->shift = shift;
 		fixedcharacters.resize(getlength(), false);
 	}
-	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift): game(answer, guesses, started, turns)
+	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift): game(answer, guesses, started, off, turns)
 	{
 		this->shift = charShift;
 		fixedcharacters.resize(getlength(), false);
@@ -285,7 +287,7 @@ public:
 	{
 		fixedcharacters.resize(getlength(), false);
 	}
-	hardtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, turns), maxtime(allowedtime), remainingtime(allowedtime)
+	hardtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, turns), maxtime(allowedtime), remainingtime(allowedtime)
 	{
 		fixedcharacters.resize(getlength(), false);
 		if (turn == 0) return;
@@ -352,7 +354,7 @@ private:
 public:
 	shiftedtimedGame(): game(){}
 	shiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime), shift(charShift){}
-	shiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	shiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
 		if (result() != 0)
 		{
@@ -408,7 +410,7 @@ private:
 public:
 	hardshiftedtimedGame(): game(){}
 	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){fixedcharacters.resize(getlength());}
-	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
 		if (result() != 0)
 		{

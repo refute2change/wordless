@@ -1,5 +1,7 @@
 #include "game.h"
 
+//template functions
+
 game::game()
 {
 
@@ -45,7 +47,7 @@ game::game(std::string word)
 	for (int i = 0; i < 26; i++) letterstates.push_back(-1);
 }
 
-game::game(std::string word, std::vector<std::string> guessessofar, bool started, int turns)
+game::game(std::string word, std::vector<std::string> guessessofar, bool started, bool off, int turns)
 {
 	answer = word;
 	length = answer.length();
@@ -93,11 +95,13 @@ game::game(std::string word, std::vector<std::string> guessessofar, bool started
 			if (turn < turns) enterevent();
 		}
 	}
+	switchedoff = off;
 }
 
 //add a charracter to active guess
 void game::addcharacter(char ch)
 {
+	if (result() != 0) return;
 	if (guesses[turn].length() < length) guesses[turn] += ch;
 	if (!begin) begin = true;
 }
@@ -105,6 +109,7 @@ void game::addcharacter(char ch)
 //remove a char from current guess
 void game::removecharacter()
 {
+	if (result() != 0) return;
 	if (guesses[turn].length() != 0)
 	{
 		std::string temp = guesses[turn].substr(0, guesses[turn].length() - 1);
@@ -184,6 +189,7 @@ const void game::flipstate()
 //result fetch
 const int game::result()
 {
+	if (switchedoff) return -1;
 	if (turn == 0) return 0;
 	for (int i = 0; i < turn; i++)
 	{
@@ -196,6 +202,10 @@ const int game::result()
 	return 0;
 }
 
+void game::quit()
+{
+	if (begin && getmaxtime() != 0) switchedoff = true;
+}
 
 int game::getfinishedtime()
 {
@@ -222,7 +232,7 @@ const bool game::isHit(sf::RenderWindow& w)
 	return (x >= gameblock.getPosition().x && y >= gameblock.getPosition().y && x < gameblock.getPosition().x + gameblock.getSize().x && y < gameblock.getPosition().y + gameblock.getSize().y);
 }
 
-
+//drawer functions
 drawer::drawer()
 {
 	wordblockinactive.loadFromFile("Images/wordblockinactive.png");
@@ -515,11 +525,13 @@ void drawer::drawresult(game* g, sf::RenderWindow& w)
 	}
 }
 
+//normalGame
 void normalGame::insertcharacter(char ch)
 {
 	addcharacter(ch);
 }
 
+//shiftedGame
 void shiftedGame::insertcharacter(char ch)
 {
 	ch -= 97;
@@ -529,6 +541,7 @@ void shiftedGame::insertcharacter(char ch)
 	addcharacter(ch);
 }
 
+//hardGame
 bool hardGame::validcheck()
 {
 	notchecked.clear();
@@ -580,6 +593,7 @@ void hardGame::insertcharacter(char ch)
 	addcharacter(ch);
 }
 
+//timedGame
 void timedGame::updateremainingtime()
 {
 	if (result() != 0) return;
@@ -630,6 +644,7 @@ const int timedGame::result()
 	return t;
 }
 
+//hardshiftedGame
 void hardshiftedGame::insertcharacter(char ch)
 {
 	ch -= 97;
@@ -684,6 +699,7 @@ bool hardshiftedGame::validcheck()
 	return true;
 }
 
+//hardtimedGame
 bool hardtimedGame::validcheck()
 {
 	notchecked.clear();
@@ -784,6 +800,7 @@ const int hardtimedGame::result()
 	return t;
 }
 
+//shiftedtimedGame
 void shiftedtimedGame::insertcharacter(char ch)
 {
 	if (!begin)
@@ -848,6 +865,7 @@ const int shiftedtimedGame::result()
 	return t;
 }
 
+//hardshiftedtimedGame
 bool hardshiftedtimedGame::validcheck()
 {
 	notchecked.clear();
