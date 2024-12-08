@@ -242,6 +242,7 @@ drawer::drawer()
 	lostmessage.loadFromFile("Images/gamelostmessage.png");
 	gamewon.loadFromFile("Images/gamewon.png");
 	font.loadFromFile("Fonts/ebrimabd.ttf");
+	notactivefont.loadFromFile("Fonts/ebrima.ttf");
 	text.setFillColor(sf::Color::Black);
 }
 
@@ -363,12 +364,13 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
 	// std::string temp = std::to_string(g->getremainingtime());
 	std::string temp = std::to_string(g->getlength()) + " letters";
-	text.setFont(font);
+	if (atgame == g->getlength() - 3) text.setFont(font);
+	else text.setFont(notactivefont);
 	text.setString(temp);
 	text.setCharacterSize(45);
 	text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
 	text.setPosition(898, 187 + 100 * (g->getlength() - 3));
-	if (g->getmaxtime() != 0 && g->result() == 0)
+	if (g->getmaxtime() != 0)
 	{
 		gameblock.setTexture(gamefailed);
 		gameblock.setScale(sf::Vector2f(1.0, 1.0));
@@ -376,7 +378,7 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 		w.draw(gameblock);
 	}
 	
-	if (atgame == g->getlength() - 3) gameblock.setTexture(gameactive);
+	if (atgame == g->getlength() - 3 && g->result() == 0) gameblock.setTexture(gameactive);
 	else if (!g->result()) gameblock.setTexture(gamenotstarted);
 	else if (g->result() == -1) gameblock.setTexture(gamefailed);
 	else gameblock.setTexture(gamewon);

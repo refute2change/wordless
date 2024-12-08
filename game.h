@@ -469,7 +469,7 @@ private:
 	std::string top = "qwertyuiop", mid = "asdfghjkl", bot = "zxcvbnm";
 	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, notvalidguess, alreadyguessed, winmessage, lostmessage;
 	sf::Sprite wordblock, characterblock, gameblock, message;
-	sf::Font font;
+	sf::Font font, notactivefont;
 	sf::Text text;
 	int messageinitiated = 0;
 public:
