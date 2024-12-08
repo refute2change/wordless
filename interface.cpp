@@ -21,19 +21,19 @@ interface::interface()
 	resigned = false;
 	finished = true;
 	detention = true;
-	struct stat sb;
-	if (stat("C:/Wordless", &sb) != 0)
-	{
-		std::filesystem::create_directories("C:/Wordless");
-		SetFileAttributesA("C:/Wordless", FILE_ATTRIBUTE_HIDDEN);
-		std::ofstream fa, fb;
-		fa.open("C:/Wordless/gamedata.txt");
-		fb.open("C:/Wordless/unfinishedgame.txt");
-		fa << 0 << '\n' << 0;
-		fb << 0;
-		fa.close();
-		fb.close();
-	}
+	// struct stat sb;
+	// if (stat("C:/Wordless", &sb) != 0)
+	// {
+	// 	std::filesystem::create_directories("C:/Wordless");
+	// 	SetFileAttributesA("C:/Wordless", FILE_ATTRIBUTE_HIDDEN);
+	// 	std::ofstream fa, fb;
+	// 	fa.open("C:/Wordless/gamedata.txt");
+	// 	fb.open("C:/Wordless/unfinishedgame.txt");
+	// 	fa << 0 << '\n' << 0;
+	// 	fb << 0;
+	// 	fa.close();
+	// 	fb.close();
+	// }
 	readgame();
 	res = 0;
 	if (handler.remainingtime() == 0) resetavailable = true;
@@ -42,7 +42,7 @@ interface::interface()
 void interface::readgame()
 {
 	bool started;
-	int turns, mode, shift;
+	int turns, mode, shift, allowedtime, remainingtime;
 	game* gamePtr = nullptr;
 	std::ifstream history("C:/Wordless/unfinishedgame.txt");
 	history >> readavailable;
@@ -63,7 +63,9 @@ void interface::readgame()
 		finished = false;
 		detention = false;
 		history >> mode;
-		if (mode == 2) history >> shift;
+		if (mode == 2 || mode == 3) history >> shift;
+		else if (mode == 4 || mode == 5) history >> allowedtime >> remainingtime;
+		else if (mode == 6 || mode == 7) history >> shift >> allowedtime >> remainingtime;
 		modes.push_back(mode);
 		history >> started >> turns;
 		std::getline(history, temp);
@@ -75,7 +77,29 @@ void interface::readgame()
 			previousanswers.push_back(inputstrings);
 		}
 		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, turns);
+		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, turns);
 		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, turns, shift);
+		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, turns, shift);
+		else if (modes[i] == 4) 
+		{
+			gamePtr = new timedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 5)
+		{
+			gamePtr = new hardtimedGame(temp, previousanswers, started, turns, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 6)
+		{
+			gamePtr = new shiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
+		else if (modes[i] == 7)
+		{
+			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, turns, shift, allowedtime, remainingtime);
+			gamePtr->begin = false;
+		}
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
 		gamez.push_back(gamePtr);
 		// gamez.push_back(game(temp, previousanswers, started, turns));
@@ -96,15 +120,45 @@ void interface::generate()
 	finished = true;
 	detention = false;
 	words = g.generator();
+	std::random_device dev;
+    std::mt19937 rng(dev());
+	std::uniform_int_distribution<std::mt19937::result_type> dist1(0, 7);
 	for (int i = 0; i < 6; i++)
 	{
-		mode = (rand() % 2) * 2;
+		mode = dist1(rng);
 		if (mode == 0) gamePtr = new normalGame(words[i]);
+		else if (mode == 1) gamePtr = new hardGame(words[i]);
 		else if (mode == 2)
 		{
 			shift = 0;
 			while (shift == 0) shift = (rand() % 51) - 25;
 			gamePtr = new shiftedGame(words[i], shift);
+		}
+		else if (mode == 3)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new hardshiftedGame(words[i], shift);
+		}
+		else if (mode == 4)
+		{
+			gamePtr = new timedGame(words[i], 45 * 1000);
+		}
+		else if (mode == 5)
+		{
+			gamePtr = new hardtimedGame(words[i], 75 * 1000);
+		}
+		else if (mode == 6)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new shiftedtimedGame(words[i], shift, 60 * 1000);
+		}
+		else if (mode == 7)
+		{
+			shift = 0;
+			while (shift == 0) shift = (rand() % 51) - 25;
+			gamePtr = new hardshiftedtimedGame(words[i], shift, 90 * 1000);
 		}
 		modes.push_back(mode);
 		// gamePtr = new normalGame(words[i]);
@@ -147,7 +201,13 @@ void interface::operate()
 					if (gamez[active]->messagestate()) gamez[active]->hidemessage(); //***
 					for (int i = 0; i < 6; i++)
 					{
-						if (gamez[i]->isHit(w)) active = i;
+						if (gamez[i]->isHit(w))
+						{
+							if (active == i) continue;
+							gamez[active]->turnofftimer();
+							gamez[i]->turnontimer();
+							active = i;
+						}
 					}
 				}
 				break;
@@ -159,7 +219,7 @@ void interface::operate()
 				break;
 			}
 		}
-		
+		if (gamez.size() != 0) gamez[active]->updateremainingtime();
 		w.clear();
 		draw();
 		resign();
@@ -235,6 +295,7 @@ void interface::resign()
 	if (resignhit())
 	{
 		resigned = true;
+		for (game* i: gamez) i->permanentturnoff();
 		std::cout << "RESIGNED\n";
 	}
 }
@@ -269,7 +330,6 @@ void interface::reset()
 		gamez.clear();
 		modes.clear();
 		generate();
-		//resignavailable = false;
 		resigned = false;
 		resetavailable = false;
 		resignavailable = true;
@@ -279,6 +339,7 @@ void interface::reset()
 		informavailable = false;
 		messageavailable = false;
 		active = 0;
+		
 		mode = 1;
 	}
 }
@@ -410,7 +471,13 @@ void interface::savegame()
 		{
 			history << modes[i];
 			if (modes[i] == 0) history << "\n";
+			else if (modes[i] == 1) history << "\n";
 			else if (modes[i] == 2) history << " " << gamez[i]->getShift() << "\n";
+			else if (modes[i] == 3) history << " " << gamez[i]->getShift() << "\n";
+			else if (modes[i] == 4) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
+			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			history << gamez[i]->begin << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';

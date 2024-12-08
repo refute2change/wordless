@@ -1,5 +1,10 @@
 #include "game.h"
 
+game::game()
+{
+
+}
+
 game::game(std::string word)
 {
 	answer = word;
@@ -90,12 +95,14 @@ game::game(std::string word, std::vector<std::string> guessessofar, bool started
 	}
 }
 
+//add a charracter to active guess
 void game::addcharacter(char ch)
 {
 	if (guesses[turn].length() < length) guesses[turn] += ch;
 	if (!begin) begin = true;
 }
 
+//remove a char from current guess
 void game::removecharacter()
 {
 	if (guesses[turn].length() != 0)
@@ -105,6 +112,7 @@ void game::removecharacter()
 	}
 }
 
+//check for valid guess
 bool game::existcheck()
 {
 	availableanswers.clear();
@@ -117,6 +125,7 @@ bool game::existcheck()
 	return false;
 }
 
+//invoked when press enter
 void game::enterevent()
 {
 	if (turn == 6) return;
@@ -124,19 +133,18 @@ void game::enterevent()
 	if (guesses[turn].length() != length) return;
 	for (int i = 0; i < turn; i++) if (guesses[turn] == guesses[i])
 	{
-		messagetime = clock();
 		messagetype = 2;
 		return;
 	}
 	if (!existcheck())
 	{
-		messagetime = clock();
 		messagetype = 1;
 		return;
 	}
 	checkguess();
 }
 
+//after valid check, this is called to check for the result of the guess
 void game::checkguess()
 {
 	guessesmap.clear();
@@ -160,6 +168,7 @@ void game::checkguess()
 	flipstate();
 }
 
+//flip state of game once game is over
 const void game::flipstate()
 {
 	time(&timestamp);
@@ -172,6 +181,7 @@ const void game::flipstate()
 	}
 }
 
+//result fetch
 const int game::result()
 {
 	if (turn == 0) return 0;
@@ -186,27 +196,32 @@ const int game::result()
 	return 0;
 }
 
+
 int game::getfinishedtime()
 {
 	return finishedtime;
 }
 
+//get list of guesses
 std::vector<std::string> game::getanswers()
 {
 	return guesses;
 }
 
+//answer of game
 std::string game::getanswer()
 {
 	return answer;
 }
 
+//state button check
 const bool game::isHit(sf::RenderWindow& w)
 {
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Left)) return false;
 	int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
 	return (x >= gameblock.getPosition().x && y >= gameblock.getPosition().y && x < gameblock.getPosition().x + gameblock.getSize().x && y < gameblock.getPosition().y + gameblock.getSize().y);
 }
+
 
 drawer::drawer()
 {
@@ -227,6 +242,7 @@ drawer::drawer()
 	lostmessage.loadFromFile("Images/gamelostmessage.png");
 	gamewon.loadFromFile("Images/gamewon.png");
 	font.loadFromFile("Fonts/ebrimabd.ttf");
+	notactivefont.loadFromFile("Fonts/ebrima.ttf");
 	text.setFillColor(sf::Color::Black);
 }
 
@@ -244,6 +260,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : top)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -259,13 +279,13 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(178 + 50 * x, 600);
+		characterblock.setPosition(150 + 50 * x, 590);
 		text.setFont(font);
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(200 + 50 * x, 622);
+		text.setPosition(172 + 50 * x, 612);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
@@ -273,6 +293,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : mid)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -288,13 +312,14 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(193 + 50 * x, 650);
+		characterblock.setPosition(165 + 50 * x, 640);
 		text.setFont(font);
+		
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(215 + 50 * x, 672);
+		text.setPosition(187 + 50 * x, 662);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
@@ -302,6 +327,10 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 	x = 0;
 	for (char c : bot)
 	{
+		c -= 97;
+		c += g->getShift() + 26;
+		c = c % 26;
+		c += 97;
 		switch (g->getcharacterstate(c))
 		{
 		case -1:
@@ -317,13 +346,14 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 			characterblock.setTexture(characterblockcorrect);
 			break;
 		}
-		characterblock.setPosition(223 + 50 * x, 700);
+		characterblock.setPosition(195 + 50 * x, 690);
 		text.setFont(font);
+		
 		temp = toupper(c);
 		text.setString(temp);
 		text.setCharacterSize(25);
 		text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
-		text.setPosition(245 + 50 * x, 722);
+		text.setPosition(217 + 50 * x, 712);
 		w.draw(characterblock);
 		w.draw(text);
 		x++;
@@ -332,16 +362,36 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
+	// std::string temp = std::to_string(g->getremainingtime());
 	std::string temp = std::to_string(g->getlength()) + " letters";
-	text.setFont(font);
+	if (atgame == g->getlength() - 3) text.setFont(font);
+	else text.setFont(notactivefont);
 	text.setString(temp);
 	text.setCharacterSize(45);
 	text.setOrigin(text.getGlobalBounds().getSize() / 2.f + text.getLocalBounds().getPosition());
 	text.setPosition(898, 187 + 100 * (g->getlength() - 3));
-	if (atgame == g->getlength() - 3) gameblock.setTexture(gameactive);
+	if (g->getmaxtime() != 0)
+	{
+		gameblock.setTexture(gamefailed);
+		gameblock.setScale(sf::Vector2f(1.0, 1.0));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+		w.draw(gameblock);
+	}
+	
+	if (atgame == g->getlength() - 3 && g->result() == 0) gameblock.setTexture(gameactive);
 	else if (!g->result()) gameblock.setTexture(gamenotstarted);
 	else if (g->result() == -1) gameblock.setTexture(gamefailed);
 	else gameblock.setTexture(gamewon);
+	if (g->getmaxtime() != 0 && g->result() == 0)
+	{
+		float scale = (float)g->getremainingtime() / g->getmaxtime();
+		gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+		w.draw(gameblock);
+		w.draw(text);
+		return;
+	}
+	gameblock.setScale(sf::Vector2f(1.0, 1.0));
 	gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
 	w.draw(gameblock);
 	w.draw(text);
@@ -479,7 +529,431 @@ void shiftedGame::insertcharacter(char ch)
 	addcharacter(ch);
 }
 
+bool hardGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardGame::enterevent()
+{
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+}
+
 void hardGame::insertcharacter(char ch)
 {
+	if (!begin) turnontimer();
 	addcharacter(ch);
+}
+
+void timedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;
+}
+
+void timedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void timedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void timedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int timedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
+void hardshiftedGame::insertcharacter(char ch)
+{
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void hardshiftedGame::enterevent()
+{
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+}
+
+bool hardshiftedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+bool hardtimedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardtimedGame::enterevent()
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+}
+
+void hardtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;
+}
+
+void hardtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void hardtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void hardtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int hardtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
+void shiftedtimedGame::insertcharacter(char ch)
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void shiftedtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;
+}
+
+void shiftedtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void shiftedtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void shiftedtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int shiftedtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
+}
+
+bool hardshiftedtimedGame::validcheck()
+{
+	notchecked.clear();
+	if (turn == 0) return true;
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i] && getguess(turn)[i] != getguess(turn - 1)[i]) return false;
+		if (fixedcharacters[i]) continue;
+		notchecked[getguess(turn)[i]]++;
+	}
+	std::map<char, int>::iterator it;
+	for (it = neededcharacters.begin(); it != neededcharacters.end(); it++) if (it->second > notchecked[it->first]) return false;
+	return true;
+}
+
+void hardshiftedtimedGame::enterevent()
+{
+	if (turn == 6) return;
+	if (result() != 0) return;
+	if (getguess(turn).length() != getlength()) return;
+	for (int i = 0; i < turn; i++) if (getguess(turn) == getguess(i))
+	{
+		setmessagestate(2);
+		return;
+	}
+	if (!existcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	if (!validcheck())
+	{
+		setmessagestate(1);
+		return;
+	}
+	checkguess();
+	neededcharacters.clear();
+	for (int i = 0; i < getlength(); i++)
+	{
+		if (fixedcharacters[i]) continue;
+		if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+		if (getresultstate(turn - 1, i) == 1) neededcharacters[getguess(turn - 1)[i]]++;
+	}
+
+}
+
+void hardshiftedtimedGame::insertcharacter(char ch)
+{
+	if (!begin)
+	{
+		begin = true;
+		turnontimer();
+	}
+	ch -= 97;
+	ch += shift + 26;
+	ch = ch % 26;
+	ch += 97;
+	addcharacter(ch);
+}
+
+void hardshiftedtimedGame::updateremainingtime()
+{
+	if (result() != 0) return;
+	if (!begin)
+	{
+		// begin = true;
+		// starttimer = clock();
+		return;
+	}
+	if (remainingtime <= 0) return;
+	int temp = clock();
+	if (!starttimer) return;
+	remainingtime -= temp - starttimer;
+	if (remainingtime <= 0)
+	{
+		remainingtime = 0;
+		flipstate();
+	}
+	starttimer = temp;	
+}
+
+void hardshiftedtimedGame::turnontimer()
+{
+	if (!active) return;
+	if (!begin) return;
+	if (!starttimer) starttimer = clock();
+}
+
+void hardshiftedtimedGame::turnofftimer()
+{
+	starttimer = 0;
+}
+
+void hardshiftedtimedGame::permanentturnoff()
+{
+	turnofftimer();
+	active = false;
+}
+
+const int hardshiftedtimedGame::result()
+{
+	int t = game::result();
+	if (t != 0) return t;
+	if (remainingtime <= 0)
+	{
+		return -1;
+	}
+	return t;
 }

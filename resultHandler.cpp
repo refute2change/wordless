@@ -4,6 +4,20 @@
 resultHandler::resultHandler()
 {
 	timestamp = time(NULL);
+	//create 2 files for history if they're missing
+	struct stat sb;
+	if (stat("C:/Wordless", &sb) != 0)
+	{
+		std::filesystem::create_directories("C:/Wordless");
+		SetFileAttributesA("C:/Wordless", FILE_ATTRIBUTE_HIDDEN);
+		std::ofstream fa, fb;
+		fa.open("C:/Wordless/gamedata.txt");
+		fb.open("C:/Wordless/unfinishedgame.txt");
+		fa << 0 << '\n' << 0;
+		fb << 0;
+		fa.close();
+		fb.close();
+	}
 	std::ifstream gamedata;
 	gamedata.open("C:/Wordless/gamedata.txt");
 	gamedata >> start >> loses;
