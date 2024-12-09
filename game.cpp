@@ -54,8 +54,8 @@ game::game(std::string word, std::vector<std::string> guessessofar, bool started
 	gameblock.setSize(sf::Vector2f(175.f, 75.f));
 	gameblock.setPosition(810, 150 + 100 * (length - 3));
 	begin = started;
+	begintosave = started;
 	for (char c : answer) answerdisplay += toupper(c);
-	begin = started;
 	switch (length)
 	{
 	case 3:
@@ -204,7 +204,11 @@ const int game::result()
 
 void game::quit()
 {
-	if (begin && getmaxtime() != 0) switchedoff = true;
+	if (begin && getmaxtime() != 0)
+	{
+		switchedoff = true;
+		flipstate();
+	}
 }
 
 int game::getfinishedtime()
@@ -373,7 +377,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
 	// std::string temp = std::to_string(g->getremainingtime());
-	std::string temp = std::to_string(g->getlength()) + " letters";
+	std::string temp = std::to_string(g->begin) + " letters";
 	if (atgame == g->getlength() - 3) text.setFont(font);
 	else text.setFont(notactivefont);
 	text.setString(temp);

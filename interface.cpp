@@ -479,7 +479,7 @@ void interface::savegame()
 			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
-			history << gamez[i]->begin << " " << gamez[i]->switchedoff << '\n';
+			history << (gamez[i]->begin | gamez[i]->begintosave) << " " << gamez[i]->switchedoff << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
 			std::vector<std::string> answers = gamez[i]->getanswers();
