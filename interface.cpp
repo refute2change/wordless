@@ -232,6 +232,8 @@ void interface::operate()
 		if (gamez.size() != 0) handleendevent();
 		w.display();
 	}
+	for (int i = 0; i < gamez.size(); i++)
+		if (gamez[i]->candie) gamez[i]->permanentturnoff();
 	handler.savelostgames();
 	savegame();
 }
@@ -466,8 +468,7 @@ void interface::savegame()
 			saved = true;
 			break;
 		}
-	for (int i = 0; i < gamez.size(); i++)
-		if (gamez[i]->candie) gamez[i]->switchedoff = true;
+	
 	if (!saved || detention) history << 0;
 	else if (finished) history << 0;
 	else

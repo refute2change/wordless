@@ -109,7 +109,11 @@ void game::addcharacter(char ch)
 {
 	if (result() != 0) return;
 	if (guesses[turn].length() < length) guesses[turn] += ch;
-	if (!begin) begin = true;
+	if (!begin)
+	{
+		begin = true;
+		candie = true;
+	}
 }
 
 //remove a char from current guess
@@ -401,7 +405,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
 	// std::string temp = std::to_string(g->stalltimer / (float)CLOCKS_PER_SEC);
-	std::string temp = std::to_string(g->getlength()) + " letters";
+	std::string temp = std::to_string(g->candie) + " letters";
 	if (atgame == g->getlength() - 3) text.setFont(font);
 	else text.setFont(notactivefont);
 	text.setString(temp);
@@ -423,12 +427,14 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	if (g->getmaxtime() != 0 && g->result() == 0)
 	{
 		float scale = (float)g->getremainingtime() / g->getmaxtime();
-		gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		//gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		gameblock.setTextureRect(sf::IntRect(0, 0, scale * gameblock.getTexture()->getSize().x, gameblock.getTexture()->getSize().y));
 		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
 	}
 	else
 	{
-		gameblock.setScale(sf::Vector2f(1.0, 1.0));
+		// gameblock.setScale(sf::Vector2f(1.0, 1.0));
+		gameblock.setTextureRect(sf::IntRect(0, 0, gameblock.getTexture()->getSize().x, gameblock.getTexture()->getSize().y));
 		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
 	}
 	w.draw(gameblock);
@@ -436,7 +442,8 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	{
 		float scale = (float)g->stalltimer / (15 * CLOCKS_PER_SEC);
 		gameblock.setTexture(gamestall);
-		gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		// gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		gameblock.setTextureRect(sf::IntRect(0, 0, scale * gameblock.getTexture()->getSize().x, gameblock.getTexture()->getSize().y));
 		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
 		w.draw(gameblock);
 	}
@@ -687,7 +694,7 @@ void timedGame::quit()
 	if (begin)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		candie = true;
+		
 		startstall = clock();
 	}
 }
@@ -855,7 +862,7 @@ void hardtimedGame::quit()
 	if (begin)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		candie = true;
+		
 		startstall = clock();
 	}
 }
@@ -866,6 +873,7 @@ void shiftedtimedGame::insertcharacter(char ch)
 	if (!begin)
 	{
 		begin = true;
+		candie = true;
 		turnontimer();
 	}
 	ch -= 97;
@@ -932,7 +940,7 @@ void shiftedtimedGame::quit()
 	if (begin)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		candie = true;
+		
 		startstall = clock();
 	}
 }
@@ -989,6 +997,7 @@ void hardshiftedtimedGame::insertcharacter(char ch)
 	if (!begin)
 	{
 		begin = true;
+		candie = true;
 		turnontimer();
 	}
 	ch -= 97;
@@ -1055,7 +1064,7 @@ void hardshiftedtimedGame::quit()
 	if (begin)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		candie = true;
+		
 		startstall = clock();
 	}
 }

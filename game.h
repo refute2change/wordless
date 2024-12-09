@@ -98,8 +98,8 @@ public:
 		if (result() == 0)
 		{
 			switchedoff = true;
-			flipstate();
 		}
+		flipstate();
 	}
 	virtual void turnofftimer()
 	{
@@ -228,6 +228,7 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		addcharacter(ch);
