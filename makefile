@@ -9,5 +9,8 @@ link:
 clean:
 	rm *.o
 
-debug: build
+debugcompile:
+	g++ -c -g *.cpp -I".\Externals\include" -DSFML_STATIC
+
+debug: debugcompile link clean
 	gdb -x debug.gdb wordless.exe

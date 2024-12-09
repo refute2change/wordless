@@ -99,7 +99,7 @@ public:
 		{
 			switchedoff = true;
 		}
-		
+		flipstate();
 	}
 	virtual void turnofftimer()
 	{
