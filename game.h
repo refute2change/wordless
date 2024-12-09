@@ -98,8 +98,9 @@ public:
 		if (result() == 0)
 		{
 			switchedoff = true;
+			flipstate();
 		}
-		flipstate();
+		
 	}
 	virtual void turnofftimer()
 	{
