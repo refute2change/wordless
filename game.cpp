@@ -404,8 +404,8 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
-	// std::string temp = std::to_string(g->messagestate());
-	std::string temp = std::to_string(g->getlength()) + " letters";
+	std::string temp = std::to_string(g->messagestate());
+	// std::string temp = std::to_string(g->getlength()) + " letters";
 	if (atgame == g->getlength() - 3) text.setFont(font);
 	else text.setFont(notactivefont);
 	text.setString(temp);
