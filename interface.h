@@ -11,7 +11,7 @@ class interface
 {
 private:
 	time_t timestamp;
-	int active = 0, previous = -1, mode = 1, i, res, count = 0;
+	int active = 0, mode = 1, i, res, count = 0;
 	sf::RenderWindow w{sf::VideoMode(1000, 800), "Wordless", sf::Style::Close | sf::Style::Titlebar};
 	sf::Event ev;
 	std::vector<std::string> words;

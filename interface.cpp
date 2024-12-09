@@ -199,7 +199,7 @@ void interface::operate()
 				if (gamez.size())
 				{
 					if (gamez[active]->messagestate()) gamez[active]->hidemessage(); //***
-					for (int i = 0; i < gamez.size(); i++)
+					for (int i = 0; i < 6; i++)
 					{
 						if (gamez[i]->isHit(w))
 						{
@@ -207,8 +207,6 @@ void interface::operate()
 							gamez[active]->turnofftimer();
 							gamez[active]->quit();
 							gamez[i]->turnontimer();
-							gamez[i]->resetdeathtimer();
-							previous = active;
 							active = i;
 						}
 					}
@@ -223,17 +221,14 @@ void interface::operate()
 			}
 		}
 		if (gamez.size() != 0) gamez[active]->updateremainingtime();
-		if (previous != -1) gamez[previous]->countdowntodeath();
 		w.clear();
 		draw();
 		resign();
 		resetcheck();
 		reset();
-		if (gamez.size() != 0) handleendevent();
+		if (gamez.size() == 6) handleendevent();
 		w.display();
 	}
-	for (int i = 0; i < gamez.size(); i++)
-		if (gamez[i]->candie) gamez[i]->permanentturnoff();
 	handler.savelostgames();
 	savegame();
 }
@@ -345,7 +340,7 @@ void interface::reset()
 		informavailable = false;
 		messageavailable = false;
 		active = 0;
-		previous = -1;
+		
 		mode = 1;
 	}
 }
@@ -462,19 +457,18 @@ void interface::savegame()
 		history << 0;
 		return;
 	}
-	for (int i = 0; i < gamez.size(); i++)
+	for (int i = 0; i < 6; i++) 
 		if (gamez[i]->begin)
 		{
 			saved = true;
 			break;
 		}
-	
 	if (!saved || detention) history << 0;
 	else if (finished) history << 0;
 	else
 	{
 		history << 1 << '\n';
-		for (int i = 0; i < gamez.size(); i++)
+		for (int i = 0; i < 6; i++)
 		{
 			history << modes[i];
 			if (modes[i] == 0) history << "\n";

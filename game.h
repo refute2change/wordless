@@ -23,14 +23,10 @@ private:
 	std::vector<std::string> guesses;
 	int finishedtime = 0;
 	sf::RectangleShape gameblock;
-protected:
-	
 public:
 	int turn = 0;
 	bool begin = false;
-	int stalltimer = 15 * CLOCKS_PER_SEC, startstall = 0;
 	bool switchedoff = false;
-	bool candie = false;
 	game();
 	game(std::string);
 	game(std::string, std::vector <std::string>, bool, bool, int);
@@ -94,12 +90,7 @@ public:
 	}
 	virtual void permanentturnoff()
 	{
-		startstall = 0;
-		if (result() == 0)
-		{
-			switchedoff = true;
-		}
-		flipstate();
+
 	}
 	virtual void turnofftimer()
 	{
@@ -116,9 +107,7 @@ public:
 	const void flipstate();
 	int getfinishedtime();
 	std::vector<std::string> getanswers();
-	virtual void quit();
-	void resetdeathtimer();
-	void countdowntodeath();
+	void quit();
 	std::string getanswer();
 	virtual void setShift(int)
 	{
@@ -228,7 +217,6 @@ public:
 		if (!begin)
 		{
 			begin = true;
-			candie = true;
 			turnontimer();
 		}
 		addcharacter(ch);
@@ -246,7 +234,6 @@ public:
 	{
 		return 0;
 	}
-	void quit() override;
 	~timedGame(){}
 };
 
@@ -285,7 +272,6 @@ public:
 	//hardGame components
 	void enterevent() override;
 	bool validcheck();
-	
 };
 
 class hardtimedGame: virtual public game
@@ -357,7 +343,6 @@ public:
 		}
 		game::removecharacter();
 	}	
-	void quit() override;
 };
 
 class shiftedtimedGame: virtual public game
@@ -411,7 +396,7 @@ public:
 		}
 		game::removecharacter();
 	}
-	void quit() override;
+	
 };
 
 class hardshiftedtimedGame: virtual public game
@@ -477,7 +462,6 @@ public:
 		}
 		game::removecharacter();
 	}
-	void quit() override;
 	~hardshiftedtimedGame(){}
 };
 
@@ -485,7 +469,7 @@ class drawer
 {
 private:
 	std::string top = "qwertyuiop", mid = "asdfghjkl", bot = "zxcvbnm";
-	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, gamestall, notvalidguess, alreadyguessed, winmessage, lostmessage;
+	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, notvalidguess, alreadyguessed, winmessage, lostmessage;
 	sf::Sprite wordblock, characterblock, gameblock, message;
 	sf::Font font, notactivefont;
 	sf::Text text;
