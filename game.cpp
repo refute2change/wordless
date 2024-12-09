@@ -96,6 +96,12 @@ game::game(std::string word, std::vector<std::string> guessessofar, bool started
 		}
 	}
 	switchedoff = off;
+	if (switchedoff)
+	{
+		candie = true;
+		stalltimer = 0;
+		flipstate();
+	}
 }
 
 //add a charracter to active guess
@@ -204,7 +210,28 @@ const int game::result()
 
 void game::quit()
 {
-	if (begin && getmaxtime() != 0) switchedoff = true;
+	return;
+}
+
+void game::resetdeathtimer()
+{
+	startstall = 0;
+	stalltimer = 15 * CLOCKS_PER_SEC;
+}
+
+void game::countdowntodeath()
+{
+	if (!startstall) return;
+	int temp = clock();
+	stalltimer -= temp - startstall;
+	startstall = temp;
+	if (stalltimer <= 0)
+	{
+		stalltimer = 0;
+		startstall = 0;
+		switchedoff = true;
+		flipstate();
+	}
 }
 
 int game::getfinishedtime()
@@ -246,11 +273,12 @@ drawer::drawer()
 	gamenotstarted.loadFromFile("Images/gamenotstarted.png");
 	gameactive.loadFromFile("Images/gameactive.png");
 	gamefailed.loadFromFile("Images/gamefailed.png");
+	gamewon.loadFromFile("Images/gamewon.png");
+	gamestall.loadFromFile("Images/gamestall.png");
 	notvalidguess.loadFromFile("Images/invalidguess.png");
 	alreadyguessed.loadFromFile("Images/repetitiveguess.png");
 	winmessage.loadFromFile("Images/gamewinmessage.png");
 	lostmessage.loadFromFile("Images/gamelostmessage.png");
-	gamewon.loadFromFile("Images/gamewon.png");
 	font.loadFromFile("Fonts/ebrimabd.ttf");
 	notactivefont.loadFromFile("Fonts/ebrima.ttf");
 	text.setFillColor(sf::Color::Black);
@@ -372,7 +400,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
-	// std::string temp = std::to_string(g->getremainingtime());
+	// std::string temp = std::to_string(g->stalltimer / (float)CLOCKS_PER_SEC);
 	std::string temp = std::to_string(g->getlength()) + " letters";
 	if (atgame == g->getlength() - 3) text.setFont(font);
 	else text.setFont(notactivefont);
@@ -397,13 +425,21 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 		float scale = (float)g->getremainingtime() / g->getmaxtime();
 		gameblock.setScale(sf::Vector2f(scale, 1.0f));
 		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
-		w.draw(gameblock);
-		w.draw(text);
-		return;
 	}
-	gameblock.setScale(sf::Vector2f(1.0, 1.0));
-	gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+	else
+	{
+		gameblock.setScale(sf::Vector2f(1.0, 1.0));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+	}
 	w.draw(gameblock);
+	if (g->startstall != 0)
+	{
+		float scale = (float)g->stalltimer / (15 * CLOCKS_PER_SEC);
+		gameblock.setTexture(gamestall);
+		gameblock.setScale(sf::Vector2f(scale, 1.0f));
+		gameblock.setPosition(810, 150 + 100 * (g->getlength() - 3));
+		w.draw(gameblock);
+	}
 	w.draw(text);
 }
 
@@ -631,6 +667,7 @@ void timedGame::permanentturnoff()
 {
 	turnofftimer();
 	active = false;
+	game::permanentturnoff();
 }
 
 const int timedGame::result()
@@ -642,6 +679,17 @@ const int timedGame::result()
 		return -1;
 	}
 	return t;
+}
+
+void timedGame::quit()
+{
+	if (result() != 0) return;
+	if (begin)
+	{
+		remainingtime = (int)(remainingtime * .75);
+		candie = true;
+		startstall = clock();
+	}
 }
 
 //hardshiftedGame
@@ -787,6 +835,7 @@ void hardtimedGame::permanentturnoff()
 {
 	turnofftimer();
 	active = false;
+	game::permanentturnoff();
 }
 
 const int hardtimedGame::result()
@@ -798,6 +847,17 @@ const int hardtimedGame::result()
 		return -1;
 	}
 	return t;
+}
+
+void hardtimedGame::quit()
+{
+	if (result() != 0) return;
+	if (begin)
+	{
+		remainingtime = (int)(remainingtime * .75);
+		candie = true;
+		startstall = clock();
+	}
 }
 
 //shiftedtimedGame
@@ -852,6 +912,7 @@ void shiftedtimedGame::permanentturnoff()
 {
 	turnofftimer();
 	active = false;
+	game::permanentturnoff();
 }
 
 const int shiftedtimedGame::result()
@@ -863,6 +924,17 @@ const int shiftedtimedGame::result()
 		return -1;
 	}
 	return t;
+}
+
+void shiftedtimedGame::quit()
+{
+	if (result() != 0) return;
+	if (begin)
+	{
+		remainingtime = (int)(remainingtime * .75);
+		candie = true;
+		startstall = clock();
+	}
 }
 
 //hardshiftedtimedGame
@@ -963,6 +1035,7 @@ void hardshiftedtimedGame::permanentturnoff()
 {
 	turnofftimer();
 	active = false;
+	game::permanentturnoff();
 }
 
 const int hardshiftedtimedGame::result()
@@ -974,4 +1047,15 @@ const int hardshiftedtimedGame::result()
 		return -1;
 	}
 	return t;
+}
+
+void hardshiftedtimedGame::quit()
+{
+	if (result() != 0) return;
+	if (begin)
+	{
+		remainingtime = (int)(remainingtime * .75);
+		candie = true;
+		startstall = clock();
+	}
 }
