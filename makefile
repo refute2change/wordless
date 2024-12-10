@@ -4,7 +4,7 @@ compile:
 	g++ -c *.cpp -I".\Externals\include" -DSFML_STATIC
 
 link:
-	g++ *.o -o wordless -L".\Externals\lib" -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lopengl32 -lfreetype -lwinmm -lgdi32 -mwindows
+	g++ *.o -o wordless -L".\Externals\lib" -lsfml-audio-s -lsfml-graphics-s -lsfml-window-s -lsfml-system-s -lvorbisfile -lvorbis -lvorbisenc -lopengl32 -lopenal32 -lfreetype -lwinmm -lgdi32 -mwindows -lflac -logg
 
 clean:
 	rm *.o

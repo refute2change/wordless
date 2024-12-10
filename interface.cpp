@@ -171,6 +171,7 @@ void interface::generate()
 
 void interface::operate()
 {
+	
 	while (w.isOpen())
 	{
 		while (w.pollEvent(ev))
@@ -207,6 +208,7 @@ void interface::operate()
 							gamez[active]->turnofftimer();
 							gamez[active]->quit();
 							gamez[i]->turnontimer();
+							gamez[i]->turnoffstall();
 							active = i;
 						}
 					}
@@ -221,6 +223,7 @@ void interface::operate()
 			}
 		}
 		if (gamez.size() != 0) gamez[active]->updateremainingtime();
+		for (int i = 0; i < gamez.size(); i++) gamez[i]->updatestall();
 		w.clear();
 		draw();
 		resign();
@@ -230,6 +233,7 @@ void interface::operate()
 		w.display();
 	}
 	handler.savelostgames();
+	for (int i = 0; i < gamez.size(); i++) if (gamez[i]->exitisdeath()) gamez[i]->switchedoff = true;
 	savegame();
 }
 
@@ -458,7 +462,7 @@ void interface::savegame()
 		return;
 	}
 	for (int i = 0; i < 6; i++) 
-		if (gamez[i]->begin)
+		if (gamez[i]->begin | gamez[i]->begintosave)
 		{
 			saved = true;
 			break;

@@ -6,7 +6,6 @@
 #include <iostream>
 #include <string>
 
-
 class interface
 {
 private:

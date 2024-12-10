@@ -76,6 +76,18 @@ public:
 		messagetype = 0;
 	}
 	virtual int getShift() = 0;
+	virtual int isDeadable()
+	{
+		return 0;
+	}
+	virtual int getremainingstall()
+	{
+		return 0;
+	}
+	virtual int getmaxstall()
+	{
+		return 0;
+	}
 	virtual int getremainingtime()
 	{
 		return 0;
@@ -98,6 +110,9 @@ public:
 	}
 	virtual void insertcharacter(char) = 0;
 	virtual void updateremainingtime(){}
+	virtual void turnonstall(){}
+	virtual void turnoffstall(){}
+	virtual void updatestall(){}
 	void addcharacter(char);
 	virtual void removecharacter();
 	virtual void enterevent();
@@ -107,8 +122,12 @@ public:
 	const void flipstate();
 	int getfinishedtime();
 	std::vector<std::string> getanswers();
-	void quit();
+	virtual void quit();
 	std::string getanswer();
+	virtual bool exitisdeath()
+	{
+		return false;
+	}
 	virtual void setShift(int)
 	{
 
@@ -185,13 +204,14 @@ public:
 class timedGame: virtual public game
 {
 private:
-	int remainingtime, starttimer = 0, maxtime;
-	bool active = true;
+	int remainingtime, starttimer = 0, maxtime, startstall = 0, stalltimer = 15 * CLOCKS_PER_SEC;
+	bool active = true, candie = false;
 public:
 	timedGame(): game(){}
 	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime){}
 	timedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, turns), remainingtime(remainingtime), maxtime(allowedtime)
 	{
+		if (off) candie = true;
 		if (result() != 0)
 		{
 			flipstate();
@@ -200,6 +220,10 @@ public:
 
 	}
 	void updateremainingtime() override;
+	bool exitisdeath() override
+	{
+		return candie;
+	}
 	int getremainingtime() override
 	{
 		return remainingtime;
@@ -208,15 +232,27 @@ public:
 	{
 		return maxtime;
 	}
+	int isDeadable() override{
+		return startstall;
+	}
 	void turnontimer() override;
 	void turnofftimer() override;
 	void permanentturnoff() override;
 	const int result() override;
+	int getremainingstall() override
+	{
+		return stalltimer;
+	}
+	int getmaxstall() override
+	{
+		return 15 * CLOCKS_PER_SEC;
+	}
 	void insertcharacter(char ch) override
 	{
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		addcharacter(ch);
@@ -226,6 +262,7 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		game::removecharacter();
@@ -234,6 +271,19 @@ public:
 	{
 		return 0;
 	}
+	void enterevent() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			candie = true;
+			turnontimer();
+		}
+		game::enterevent();
+	}
+	void quit() override;
+	void turnoffstall() override;
+	void updatestall() override;
 	~timedGame(){}
 };
 
@@ -279,8 +329,8 @@ class hardtimedGame: virtual public game
 private:
 	std::vector<bool> fixedcharacters;
 	std::map<char, int> neededcharacters, notchecked;
-	int remainingtime, starttimer = 0, maxtime;
-	bool active = true;
+	int remainingtime, starttimer = 0, maxtime, startstall = 0, stalltimer = 15 * CLOCKS_PER_SEC;
+	bool active = true, candie = false;
 public:
 	hardtimedGame(): game(){}
 	hardtimedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime)
@@ -297,6 +347,7 @@ public:
 			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
 			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
 		}
+		if (off) candie = true;
 		if (result() != 0)
 		{
 			flipstate();
@@ -312,6 +363,10 @@ public:
 		return 0;
 	}
 	//timedGame components
+	bool exitisdeath() override
+	{
+		return candie;
+	}
 	void updateremainingtime() override;
 	int getremainingtime() override
 	{
@@ -320,6 +375,17 @@ public:
 	int getmaxtime() override
 	{
 		return maxtime;
+	}
+	int getremainingstall() override
+	{
+		return stalltimer;
+	}
+	int getmaxstall() override
+	{
+		return 15 * CLOCKS_PER_SEC;
+	}
+	int isDeadable() override{
+		return startstall;
 	}
 	void turnontimer() override;
 	void turnofftimer() override;
@@ -330,6 +396,7 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		addcharacter(ch);
@@ -339,23 +406,28 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		game::removecharacter();
 	}	
+	void quit() override;
+	void turnoffstall() override;
+	void updatestall() override;
 };
 
 class shiftedtimedGame: virtual public game
 {
 private:
 	int shift = 0;
-	int remainingtime, starttimer = 0, maxtime;
-	bool active = true;
+	int remainingtime, starttimer = 0, maxtime, startstall = 0, stalltimer = 15 * CLOCKS_PER_SEC;
+	bool active = true, candie = false;
 public:
 	shiftedtimedGame(): game(){}
 	shiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime), shift(charShift){}
 	shiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
+		if (off) candie = true;
 		if (result() != 0)
 		{
 			flipstate();
@@ -365,6 +437,16 @@ public:
 	~shiftedtimedGame(){}
 	//shiftedGame components
 	void insertcharacter(char) override;
+	void enterevent() override
+	{
+		if (!begin)
+		{
+			begin = true;
+			candie = true;
+			turnontimer();
+		}
+		game::enterevent();
+	}
 	int getShift() override
 	{
 		return shift;
@@ -374,6 +456,21 @@ public:
 		shift = newShift;
 	}
 	//timedGame components
+	bool exitisdeath() override
+	{
+		return candie;
+	}
+	int getremainingstall() override
+	{
+		return stalltimer;
+	}
+	int getmaxstall() override
+	{
+		return 15 * CLOCKS_PER_SEC;
+	}
+	int isDeadable() override{
+		return startstall;
+	}
 	void updateremainingtime() override;
 	int getremainingtime() override
 	{
@@ -392,10 +489,14 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		game::removecharacter();
 	}
+	void quit() override;
+	void turnoffstall() override;
+	void updatestall() override;
 	
 };
 
@@ -405,13 +506,14 @@ private:
 	std::vector<bool> fixedcharacters;
 	std::map<char, int> neededcharacters, notchecked;
 	int shift = 0;
-	int remainingtime, starttimer = 0, maxtime;
-	bool active = true;
+	int remainingtime, starttimer = 0, maxtime, startstall = 0, stalltimer = 15 * CLOCKS_PER_SEC;
+	bool active = true, candie = false;
 public:
 	hardshiftedtimedGame(): game(){}
 	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){fixedcharacters.resize(getlength());}
 	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
+		if (off) candie = true;
 		if (result() != 0)
 		{
 			flipstate();
@@ -440,6 +542,21 @@ public:
 		shift = newShift;
 	}
 	//timedGame components
+	bool exitisdeath() override
+	{
+		return candie;
+	}
+	int getremainingstall() override
+	{
+		return stalltimer;
+	}
+	int getmaxstall() override
+	{
+		return 15 * CLOCKS_PER_SEC;
+	}
+	int isDeadable() override{
+		return startstall;
+	}
 	void updateremainingtime() override;
 	int getremainingtime() override
 	{
@@ -458,10 +575,14 @@ public:
 		if (!begin)
 		{
 			begin = true;
+			candie = true;
 			turnontimer();
 		}
 		game::removecharacter();
 	}
+	void quit() override;
+	void turnoffstall() override;
+	void updatestall() override;
 	~hardshiftedtimedGame(){}
 };
 
@@ -469,7 +590,7 @@ class drawer
 {
 private:
 	std::string top = "qwertyuiop", mid = "asdfghjkl", bot = "zxcvbnm";
-	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, notvalidguess, alreadyguessed, winmessage, lostmessage;
+	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, gamestall, notvalidguess, alreadyguessed, winmessage, lostmessage;
 	sf::Sprite wordblock, characterblock, gameblock, message;
 	sf::Font font, notactivefont;
 	sf::Text text;
