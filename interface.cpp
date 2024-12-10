@@ -171,7 +171,6 @@ void interface::generate()
 
 void interface::operate()
 {
-	
 	while (w.isOpen())
 	{
 		while (w.pollEvent(ev))
@@ -462,7 +461,7 @@ void interface::savegame()
 		return;
 	}
 	for (int i = 0; i < 6; i++) 
-		if (gamez[i]->begin | gamez[i]->begintosave)
+		if (gamez[i]->begin || gamez[i]->begintosave)
 		{
 			saved = true;
 			break;
@@ -483,7 +482,7 @@ void interface::savegame()
 			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
-			history << (gamez[i]->begin | gamez[i]->begintosave) << " " << gamez[i]->switchedoff << '\n';
+			history << (gamez[i]->begin || gamez[i]->begintosave) << " " << gamez[i]->switchedoff << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
 			std::vector<std::string> answers = gamez[i]->getanswers();
