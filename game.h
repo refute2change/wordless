@@ -608,7 +608,7 @@ public:
 		if (!instance)
 		{
 			std::lock_guard<std::mutex> lock(mtx);
-			instance = new drawer(0);
+			instance = new drawer;
 		}
 		return instance;
 	}
