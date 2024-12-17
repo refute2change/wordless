@@ -244,8 +244,8 @@ void interface::draw()
 	w.draw(resetbutton);
 	drawclock();
 	if (gamez.size() == 0) return;
-	for (int i = 0; i < 6; i++) d.drawstate(gamez[i], w, active);
-	d.draw(gamez[active], w);
+	for (int i = 0; i < 6; i++) drawer::getInstance()->drawstate(gamez[i], w, active);
+	drawer::getInstance()->draw(gamez[active], w);
 	if (informavailable) w.draw(inform);
 	if (messageavailable) w.draw(message);
 }

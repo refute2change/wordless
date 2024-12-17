@@ -7,6 +7,7 @@
 #include <ctime>
 #include <fstream>
 #include <cmath>
+#include <mutex>
 
 class game
 {
@@ -595,8 +596,22 @@ private:
 	sf::Font font, notactivefont;
 	sf::Text text;
 	int messageinitiated = 0;
-public:
 	drawer();
+	static drawer* instance;
+	static std::mutex mtx;
+public:
+	drawer(const int value){}
+	drawer(const drawer& other) = delete;
+    void operator=(const drawer& other) = delete;
+	static drawer* getInstance()
+	{
+		if (!instance)
+		{
+			std::lock_guard<std::mutex> lock(mtx);
+			instance = new drawer(0);
+		}
+		return instance;
+	}
 	void drawresult(game*, sf::RenderWindow&);
 	void drawkeyboard(game*, sf::RenderWindow&);
 	void draw(game*, sf::RenderWindow&);

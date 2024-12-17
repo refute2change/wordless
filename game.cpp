@@ -259,9 +259,9 @@ drawer::drawer()
 
 void drawer::draw(game* g, sf::RenderWindow& w)
 {
-	drawkeyboard(g, w);
-	drawresult(g, w);
-	drawmessage(g, w);
+	drawer::getInstance()->drawkeyboard(g, w);
+	drawer::getInstance()->drawresult(g, w);
+	drawer::getInstance()->drawmessage(g, w);
 }
 
 void drawer::drawkeyboard(game* g, sf::RenderWindow& w)

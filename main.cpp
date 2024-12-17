@@ -2,6 +2,9 @@
 #include <ctime>
 #include "interface.h"
 
+drawer* drawer::instance{nullptr};
+std::mutex drawer::mtx;
+
 int main()
 {
     interface i;

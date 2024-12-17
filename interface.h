@@ -26,7 +26,6 @@ private:
 	bool resignavailable = true, resigned = false, detention = false, messageavailable = false;
 	bool resetavailable = false, finished = false, typeable = true, informavailable = false, focus = true;
 	resultHandler handler;
-	drawer d;
 public:
 	void readgame();
 	interface();
