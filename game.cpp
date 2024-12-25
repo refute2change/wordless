@@ -189,7 +189,6 @@ const void game::flipstate()
 //result fetch
 const int game::result()
 {
-	if (switchedoff) return -1;
 	if (turn == 0) return 0;
 	for (int i = 0; i < turn; i++)
 	{
@@ -199,6 +198,7 @@ const int game::result()
 	{
 		return -1;
 	}
+	if (switchedoff) return -1;
 	return 0;
 }
 
