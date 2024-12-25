@@ -597,12 +597,12 @@ private:
 	sf::Text text;
 	int messageinitiated = 0;
 	drawer();
+	drawer(const drawer& other) = delete;
+    void operator=(const drawer& other) = delete;
 	static drawer* instance;
 	static std::mutex mtx;
 public:
 	drawer(const int value){}
-	drawer(const drawer& other) = delete;
-    void operator=(const drawer& other) = delete;
 	static drawer* getInstance()
 	{
 		if (!instance)
