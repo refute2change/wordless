@@ -17,7 +17,7 @@ private:
 	sf::Sprite *resignbutton, *resetbutton, *inform, *message;
 	wordGenerator g;
 	sf::Font font;
-	sf::Text *min, *sec;
+	sf::Text *min = nullptr, *sec = nullptr;
 	std::string mins, secs, temp;
 	std::vector<int> modes;
 	std::vector<game*> gamez;

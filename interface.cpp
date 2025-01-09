@@ -15,7 +15,6 @@ interface::interface()
 	resignbutton->setPosition({920, 50});
 	resetbutton = new sf::Sprite(*resetinactive);
 	resetbutton->setPosition({810, 50});
-	inform = new sf::Sprite(*newinform);
 	message = new sf::Sprite(*totalwinmessage);
 	if (!font.openFromFile("Fonts/ebrimabd.ttf"));
 	min = new sf::Text(font);
@@ -288,7 +287,7 @@ void interface::draw()
 	else resetbutton->setTexture(*resetinactive);
 	if (resignavailable) w.draw(*resignbutton);
 	w.draw(*resetbutton);
-	drawclock();
+	this->drawclock();
 	if (gamez.size() == 0) return;
 	for (int i = 0; i < 6; i++) drawer::getInstance()->drawstate(gamez[i], w, active);
 	drawer::getInstance()->draw(gamez[active], w);
@@ -426,7 +425,6 @@ void interface::handleendevent()
 	switch (finalresult())
 	{
 	case -1:
-		std::cout << "LOST\n";
 		typeable = false;
 		resignavailable = false;
 		informavailable = true;
@@ -435,7 +433,6 @@ void interface::handleendevent()
 		lose(timestamp);
 		break;
 	case 1:
-		std::cout << "WON\n";
 		typeable = false;
 		resignavailable = false;
 		informavailable = true;
@@ -448,7 +445,12 @@ void interface::handleendevent()
 
 void interface::drawclock()
 {
-	if (resetavailable) return;
+	if (!min) min = new sf::Text(font);
+	if (!sec) sec = new sf::Text(font);
+	if (resetavailable)
+	{
+		return;
+	}
 	if (handler.remainingtime() == 0 && finalresult() == 0)
 	{
 		mins = "-";
@@ -465,7 +467,7 @@ void interface::drawclock()
 	min->setFont(font);
 	min->setString(mins);
 	min->setCharacterSize(30);
-	min->setOrigin(min->getGlobalBounds().getCenter());
+	min->setOrigin(min->getLocalBounds().getCenter());
 	switch (mins.length())
 	{
 	case 1:
@@ -483,7 +485,7 @@ void interface::drawclock()
 	sec->setFont(font);
 	sec->setString(secs);
 	sec->setCharacterSize(30);
-	sec->setOrigin(sec->getGlobalBounds().getCenter());
+	sec->setOrigin(sec->getLocalBounds().getCenter());
 	sec->setPosition({890., 80.});
 	sec->setFillColor(sf::Color::Black);
 	w.draw(*min);

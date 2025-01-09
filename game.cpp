@@ -301,7 +301,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 		temp = toupper(c);
 		text->setString(temp);
 		text->setCharacterSize(25);
-		text->setOrigin(text->getGlobalBounds().getCenter());
+		text->setOrigin(text->getLocalBounds().getCenter());
 		text->setPosition({(float)172 + 50 * x, (float)612});
 		w.draw(*characterblock);
 		w.draw(*text);
@@ -335,7 +335,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 		temp = toupper(c);
 		text->setString(temp);
 		text->setCharacterSize(25);
-		text->setOrigin(text->getGlobalBounds().getCenter());
+		text->setOrigin(text->getLocalBounds().getCenter());
 		text->setPosition({(float)187 + 50 * x, (float)662});
 		w.draw(*characterblock);
 		w.draw(*text);
@@ -369,7 +369,7 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 		temp = toupper(c);
 		text->setString(temp);
 		text->setCharacterSize(25);
-		text->setOrigin(text->getGlobalBounds().getCenter());
+		text->setOrigin(text->getLocalBounds().getCenter());
 		text->setPosition({(float)217 + 50 * x, (float)712});
 		w.draw(*characterblock);
 		w.draw(*text);
@@ -388,7 +388,7 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	else text->setFont(notactivefont);
 	text->setString(temp);
 	text->setCharacterSize(45);
-	text->setOrigin(text->getGlobalBounds().getCenter());
+	text->setOrigin(text->getLocalBounds().getCenter());
 	text->setPosition({(float)898, (float)187 + 100 * (g->getlength() - 3)});
 	if (g->getmaxtime() != 0)
 	{
@@ -483,7 +483,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 			text->setFont(this->font);
 			text->setString(g->getdisplaystring());
 			text->setCharacterSize(45);
-			text->setOrigin(text->getGlobalBounds().getCenter());
+			text->setOrigin(text->getLocalBounds().getCenter());
 			text->setPosition({500., 420.});
 			message->setPosition({300., 300.});
 			w.draw(*this->message);
@@ -498,7 +498,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 			text->setFont(this->font);
 			text->setString(g->getdisplaystring());
 			text->setCharacterSize(45);
-			text->setOrigin(text->getGlobalBounds().getCenter());
+			text->setOrigin(text->getLocalBounds().getCenter());
 			text->setPosition({500., 420});
 			message->setPosition({300., 300.});
 			w.draw(*this->message);
@@ -538,8 +538,8 @@ void drawer::drawresult(game* g, sf::RenderWindow& w)
 			text->setFont(this->font);
 			text->setString(displaystring);
 			text->setCharacterSize(45);
-			text->setOrigin(text->getGlobalBounds().getCenter());
-			text->setPosition({beginposition + 37 + 85 * j, 87 + 85 * i});
+			text->setOrigin(text->getLocalBounds().getCenter());
+			text->setPosition({(float)beginposition + 37 + 85 * j, (float)87 + 85 * i});
 			w.draw(*this->wordblock);
 			w.draw(*this->text);
 		}
