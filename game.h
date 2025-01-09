@@ -26,7 +26,7 @@ private:
 	sf::RectangleShape gameblock;
 public:
 	int turn = 0;
-	bool begin = false, begintosave;
+	bool begin = false, begintosave = false;
 	bool switchedoff = false;
 	game();
 	game(std::string);
