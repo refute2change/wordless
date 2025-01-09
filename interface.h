@@ -6,20 +6,18 @@
 #include <iostream>
 #include <string>
 
-
 class interface
 {
 private:
 	time_t timestamp;
 	int active = 0, mode = 1, i, res, count = 0;
-	sf::RenderWindow w{sf::VideoMode(1000, 800), "Wordless", sf::Style::Close | sf::Style::Titlebar};
-	sf::Event ev;
+	sf::RenderWindow w{sf::VideoMode({1000, 800}), "Wordless", sf::Style::Close | sf::Style::Titlebar};
 	std::vector<std::string> words;
-	sf::Texture resigntexture, resetinactive, resetactive, totalwinmessage, timerresetmessage, newinform;
-	sf::Sprite resignbutton, resetbutton, inform, message;
+	sf::Texture *resigntexture, *resetinactive, *resetactive, *totalwinmessage, *timerresetmessage, *newinform;
+	sf::Sprite *resignbutton, *resetbutton, *inform, *message;
 	wordGenerator g;
 	sf::Font font;
-	sf::Text min, sec;
+	sf::Text *min = nullptr, *sec = nullptr;
 	std::string mins, secs, temp;
 	std::vector<int> modes;
 	std::vector<game*> gamez;
@@ -27,7 +25,6 @@ private:
 	bool resignavailable = true, resigned = false, detention = false, messageavailable = false;
 	bool resetavailable = false, finished = false, typeable = true, informavailable = false, focus = true;
 	resultHandler handler;
-	drawer d;
 public:
 	void readgame();
 	interface();
