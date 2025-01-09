@@ -3,18 +3,23 @@
 interface::interface()
 {
 	srand(time(NULL));
-	totalwinmessage.loadFromFile("Images/totalwinmessage.png");
-	timerresetmessage.loadFromFile("Images/timerresetmessage.png");
-	newinform.loadFromFile("Images/newinform.png");
-	inform.setTexture(newinform);
-	inform.setPosition(50, 710);
-	resigntexture.loadFromFile("Images/resignbutton.png");
-	resetinactive.loadFromFile("Images/resetinactive.png");
-	resetactive.loadFromFile("Images/resetactive.png");
-	resignbutton.setTexture(resigntexture);
-	resignbutton.setPosition(920, 50);
-	resetbutton.setPosition(810, 50);
-	font.loadFromFile("Fonts/ebrimabd.ttf");
+	totalwinmessage = new sf::Texture("Images/totalwinmessage.png");
+	timerresetmessage = new sf::Texture("Images/timerresetmessage.png");
+	newinform = new sf::Texture("Images/newinform.png");
+	inform = new sf::Sprite(*newinform);
+	inform->setPosition({50., 710.});
+	resigntexture = new sf::Texture("Images/resignbutton.png");
+	resetinactive = new sf::Texture("Images/resetinactive.png");
+	resetactive = new sf::Texture("Images/resetactive.png");
+	resignbutton = new sf::Sprite(*resigntexture);
+	resignbutton->setPosition({920, 50});
+	resetbutton = new sf::Sprite(*resetinactive);
+	resetbutton->setPosition({810, 50});
+	inform = new sf::Sprite(*newinform);
+	message = new sf::Sprite(*totalwinmessage);
+	if (!font.openFromFile("Fonts/ebrimabd.ttf"));
+	min = new sf::Text(font);
+	sec = new sf::Text(font);
 	typeable = false;
 	resignavailable = false;
 	resetavailable = false;
@@ -173,26 +178,24 @@ void interface::operate()
 {
 	while (w.isOpen())
 	{
-		while (w.pollEvent(ev))
-		{
-			switch (ev.type)
+		while (const std::optional event = w.pollEvent())
+        {
+            if (event->is<sf::Event::Closed>()) w.close();
+			else if (const auto* textEntered = event->getIf<sf::Event::TextEntered>())
 			{
-			case sf::Event::Closed:
-				w.close();
-				break;
-			case sf::Event::TextEntered:
-				if (!typeable) break;
-				if (gamez.size() == 0) break;
-				else if (ev.text.unicode == 13) gamez[active]->enterevent();
-				else if (ev.text.unicode == 8) gamez[active]->removecharacter();
-				else if ((ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') || (ev.text.unicode >= 'a' && ev.text.unicode <= 'z'))
+				if (!typeable);
+				else if (gamez.size() == 0);
+				else if (textEntered->unicode == 13) gamez[active]->enterevent();
+				else if (textEntered->unicode == 8) gamez[active]->removecharacter();
+				else if ((textEntered->unicode >= 'A' && textEntered->unicode <= 'Z') || (textEntered->unicode >= 'a' && textEntered->unicode <= 'z'))
 				{
 					if (gamez[active]->result() != 0) break;
-					if (ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') gamez[active]->insertcharacter(ev.text.unicode + 32);
-					else gamez[active]->insertcharacter(ev.text.unicode);
+					if (textEntered->unicode >= 'A' && textEntered->unicode <= 'Z') gamez[active]->insertcharacter(textEntered->unicode + 32);
+					else gamez[active]->insertcharacter(textEntered->unicode);
 				}
-				break;
-			case sf::Event::MouseButtonPressed:
+			}
+			else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
+			{
 				if (!focus) break;
 				if (messageavailable) messageavailable = false;
 				else if (informhit()) messageavailable = true;
@@ -212,15 +215,58 @@ void interface::operate()
 						}
 					}
 				}
-				break;
-			case sf::Event::GainedFocus:
-				focus = true;
-				break;
-			case sf::Event::LostFocus:
-				focus = false;
-				break;
 			}
-		}
+			else if (event->is<sf::Event::FocusLost>()) focus = false;
+			else if (event->is<sf::Event::FocusGained>()) focus = true;
+        }
+		// while (w.pollEvent(ev))
+		// {
+		// 	switch (ev.type)
+		// 	{
+		// 	case sf::Event::Closed:
+		// 		w.close();
+		// 		break;
+		// 	case sf::Event::TextEntered:
+		// 		if (!typeable) break;
+		// 		if (gamez.size() == 0) break;
+		// 		else if (ev.text.unicode == 13) gamez[active]->enterevent();
+		// 		else if (ev.text.unicode == 8) gamez[active]->removecharacter();
+		// 		else if ((ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') || (ev.text.unicode >= 'a' && ev.text.unicode <= 'z'))
+		// 		{
+		// 			if (gamez[active]->result() != 0) break;
+		// 			if (ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') gamez[active]->insertcharacter(ev.text.unicode + 32);
+		// 			else gamez[active]->insertcharacter(ev.text.unicode);
+		// 		}
+		// 		break;
+		// 	case sf::Event::MouseButtonPressed:
+		// 		if (!focus) break;
+		// 		if (messageavailable) messageavailable = false;
+		// 		else if (informhit()) messageavailable = true;
+		// 		if (gamez.size())
+		// 		{
+		// 			if (gamez[active]->messagestate()) gamez[active]->hidemessage(); //***
+		// 			for (int i = 0; i < 6; i++)
+		// 			{
+		// 				if (gamez[i]->isHit(w))
+		// 				{
+		// 					if (active == i) continue;
+		// 					gamez[active]->turnofftimer();
+		// 					gamez[active]->quit();
+		// 					gamez[i]->turnontimer();
+		// 					gamez[i]->turnoffstall();
+		// 					active = i;
+		// 				}
+		// 			}
+		// 		}
+		// 		break;
+		// 	case sf::Event::GainedFocus:
+		// 		focus = true;
+		// 		break;
+		// 	case sf::Event::LostFocus:
+		// 		focus = false;
+		// 		break;
+		// 	}
+		// }
 		if (gamez.size() != 0) gamez[active]->updateremainingtime();
 		for (int i = 0; i < gamez.size(); i++) gamez[i]->updatestall();
 		w.clear();
@@ -238,16 +284,16 @@ void interface::operate()
 
 void interface::draw()
 {
-	if (resetavailable) resetbutton.setTexture(resetactive);
-	else resetbutton.setTexture(resetinactive);
-	if (resignavailable) w.draw(resignbutton);
-	w.draw(resetbutton);
+	if (resetavailable) resetbutton->setTexture(*resetactive);
+	else resetbutton->setTexture(*resetinactive);
+	if (resignavailable) w.draw(*resignbutton);
+	w.draw(*resetbutton);
 	drawclock();
 	if (gamez.size() == 0) return;
 	for (int i = 0; i < 6; i++) drawer::getInstance()->drawstate(gamez[i], w, active);
 	drawer::getInstance()->draw(gamez[active], w);
-	if (informavailable) w.draw(inform);
-	if (messageavailable) w.draw(message);
+	if (informavailable) w.draw(*inform);
+	if (messageavailable) w.draw(*message);
 }
 
 int interface::finalresult()
@@ -280,10 +326,10 @@ int interface::finalresult()
 bool interface::resignhit()
 {
 	if (!resignavailable) return false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
-		if (x >= resignbutton.getPosition().x && y >= resignbutton.getPosition().y && x <= resignbutton.getPosition().x + 60 && y <= resignbutton.getPosition().y + 60)
+		if (x >= resignbutton->getPosition().x && y >= resignbutton->getPosition().y && x <= resignbutton->getPosition().x + 60 && y <= resignbutton->getPosition().y + 60)
 		{
 			resignavailable = false;
 			count++;
@@ -308,10 +354,10 @@ bool interface::resethit()
 {
 	if (!resetavailable) return false;
 	if (handler.remainingtime() != 0) return false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
-		if (x >= resetbutton.getPosition().x && y >= resetbutton.getPosition().y && x <= resetbutton.getPosition().x + 100 && y <= resetbutton.getPosition().y + 60)
+		if (x >= resetbutton->getPosition().x && y >= resetbutton->getPosition().y && x <= resetbutton->getPosition().x + 100 && y <= resetbutton->getPosition().y + 60)
 		{
 			resignavailable = false;
 			return true;
@@ -351,7 +397,7 @@ void interface::reset()
 bool interface::informhit()
 {
 	if (!informavailable) return false;
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
 		int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
 		if ((x - 70) * (x - 70) + (y - 730) * (y - 730) <= 400)
@@ -384,8 +430,8 @@ void interface::handleendevent()
 		typeable = false;
 		resignavailable = false;
 		informavailable = true;
-		message.setTexture(timerresetmessage);
-		message.setPosition(300, 300);
+		message->setTexture(*timerresetmessage);
+		message->setPosition({300., 300.});
 		lose(timestamp);
 		break;
 	case 1:
@@ -393,8 +439,8 @@ void interface::handleendevent()
 		typeable = false;
 		resignavailable = false;
 		informavailable = true;
-		message.setTexture(totalwinmessage);
-		message.setPosition(300, 300);
+		message->setTexture(*totalwinmessage);
+		message->setPosition({300., 300.});
 		win();
 		break;
 	}
@@ -416,32 +462,32 @@ void interface::drawclock()
 		secs = std::to_string(seconds);
 		if (seconds < 10) secs = "0" + secs;
 	}
-	min.setFont(font);
-	min.setString(mins);
-	min.setCharacterSize(30);
-	min.setOrigin(min.getGlobalBounds().getSize() / 2.f + min.getLocalBounds().getPosition());
+	min->setFont(font);
+	min->setString(mins);
+	min->setCharacterSize(30);
+	min->setOrigin(min->getGlobalBounds().getCenter());
 	switch (mins.length())
 	{
 	case 1:
-		min.setPosition(856, 80);
+		min->setPosition({856., 80});
 		break;
 	case 2:
-		min.setPosition(850, 80);
+		min->setPosition({850., 80.});
 		break;
 	case 3:
-		min.setPosition(841, 80);
+		min->setPosition({841., 80.});
 		break;
 	}
 	
-	min.setFillColor(sf::Color::Black);
-	sec.setFont(font);
-	sec.setString(secs);
-	sec.setCharacterSize(30);
-	sec.setOrigin(sec.getGlobalBounds().getSize() / 2.f + sec.getLocalBounds().getPosition());
-	sec.setPosition(890, 80);
-	sec.setFillColor(sf::Color::Black);
-	w.draw(min);
-	w.draw(sec);
+	min->setFillColor(sf::Color::Black);
+	sec->setFont(font);
+	sec->setString(secs);
+	sec->setCharacterSize(30);
+	sec->setOrigin(sec->getGlobalBounds().getCenter());
+	sec->setPosition({890., 80.});
+	sec->setFillColor(sf::Color::Black);
+	w.draw(*min);
+	w.draw(*sec);
 }
 
 void interface::resetcheck()

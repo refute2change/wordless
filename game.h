@@ -591,10 +591,10 @@ class drawer
 {
 private:
 	std::string top = "qwertyuiop", mid = "asdfghjkl", bot = "zxcvbnm";
-	sf::Texture wordblockinactive, wordblocknotexisted, wordblockwrongplace, wordblockcorrect, characterblockinactive, characterblocknotexisted, characterblockwrongplace, characterblockcorrect, gamenotstarted, gameactive, gamefailed, gamewon, gamestall, notvalidguess, alreadyguessed, winmessage, lostmessage;
-	sf::Sprite wordblock, characterblock, gameblock, message;
+	sf::Texture *wordblockinactive, *wordblocknotexisted, *wordblockwrongplace, *wordblockcorrect, *characterblockinactive, *characterblocknotexisted, *characterblockwrongplace, *characterblockcorrect, *gamenotstarted, *gameactive, *gamefailed, *gamewon, *gamestall, *notvalidguess, *alreadyguessed, *winmessage, *lostmessage;
+	sf::Sprite *wordblock, *characterblock, *gameblock, *message;
 	sf::Font font, notactivefont;
-	sf::Text text;
+	sf::Text *text = nullptr;
 	int messageinitiated = 0;
 	drawer();
 	drawer(const drawer& other) = delete;
