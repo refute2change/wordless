@@ -12,9 +12,9 @@ interface::interface()
 	resetinactive = new sf::Texture("Images/resetinactive.png");
 	resetactive = new sf::Texture("Images/resetactive.png");
 	resignbutton = new sf::Sprite(*resigntexture);
-	resignbutton->setPosition({920, 50});
+	resignbutton->setPosition({920., 50.});
 	resetbutton = new sf::Sprite(*resetinactive);
-	resetbutton->setPosition({810, 50});
+	resetbutton->setPosition({810., 50.});
 	message = new sf::Sprite(*totalwinmessage);
 	if (!font.openFromFile("Fonts/ebrimabd.ttf"));
 	min = new sf::Text(font);
@@ -471,7 +471,7 @@ void interface::drawclock()
 	switch (mins.length())
 	{
 	case 1:
-		min->setPosition({856., 80});
+		min->setPosition({856., 80.});
 		break;
 	case 2:
 		min->setPosition({850., 80.});

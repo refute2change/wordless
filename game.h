@@ -8,6 +8,7 @@
 #include <fstream>
 #include <cmath>
 #include <mutex>
+#include <random>
 
 class game
 {
@@ -24,6 +25,7 @@ private:
 	std::vector<std::string> guesses;
 	int finishedtime = 0;
 	sf::RectangleShape gameblock;
+	bool accessible = true, gauntlet = false;
 public:
 	int turn = 0;
 	bool begin = false, begintosave = false;
@@ -31,6 +33,7 @@ public:
 	game();
 	game(std::string);
 	game(std::string, std::vector <std::string>, bool, bool, int);
+	game(std::string, std::vector <std::string>, bool, bool, bool, int);
 	virtual ~game(){}
 	std::string getdisplaystring()
 	{
@@ -77,6 +80,10 @@ public:
 		messagetype = 0;
 	}
 	virtual int getShift() = 0;
+	bool isGauntlet()
+	{
+		return gauntlet;
+	}
 	virtual int isDeadable()
 	{
 		return 0;
@@ -142,6 +149,7 @@ public:
 	normalGame(): game(){}
 	normalGame(std::string answer): game(answer){}
 	normalGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns): game(answer, guesses, started, off, turns){}
+	normalGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns): game(answer, guesses, started, off, isGauntlet, turns){}
 	~normalGame(){}
 	void insertcharacter(char) override;
 	int getShift() override
@@ -172,6 +180,17 @@ public:
 			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
 		}
 	}
+	hardGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns): game(answer, guesses, started, off, isGauntlet, turns)
+	{
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+	}
 	~hardGame(){}
 	void insertcharacter(char) override;
 	bool validcheck();
@@ -190,6 +209,7 @@ public:
 	shiftedGame(): game(){}
 	shiftedGame(std::string answer, int charShift): game(answer), shift(charShift){}
 	shiftedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift): game(answer, guesses, started, off, turns), shift(charShift){}
+	shiftedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int charShift): game(answer, guesses, started, off, isGauntlet, turns), shift(charShift){}
 	~shiftedGame(){}
 	void insertcharacter(char) override;
 	int getShift() override
@@ -211,6 +231,16 @@ public:
 	timedGame(): game(){}
 	timedGame(std::string answer, int allowedtime): game(answer), remainingtime(allowedtime), maxtime(allowedtime){}
 	timedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, turns), remainingtime(remainingtime), maxtime(allowedtime)
+	{
+		if (off) candie = true;
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+
+	}
+	timedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, isGauntlet, turns), remainingtime(remainingtime), maxtime(allowedtime)
 	{
 		if (off) candie = true;
 		if (result() != 0)
@@ -313,6 +343,18 @@ public:
 			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
 		}
 	}
+	hardshiftedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int charShift): game(answer, guesses, started, off, isGauntlet, turns)
+	{
+		this->shift = charShift;
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+	}
 	~hardshiftedGame(){}
 	//shiftedGame conponents
 	int getShift() override
@@ -339,6 +381,23 @@ public:
 		fixedcharacters.resize(getlength(), false);
 	}
 	hardtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, turns), maxtime(allowedtime), remainingtime(allowedtime)
+	{
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+		if (off) candie = true;
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
+	hardtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int allowedtime, int remainingtime): game(answer, guesses, started, off, isGauntlet, turns), maxtime(allowedtime), remainingtime(allowedtime)
 	{
 		fixedcharacters.resize(getlength(), false);
 		if (turn == 0) return;
@@ -435,6 +494,15 @@ public:
 			permanentturnoff();
 		}
 	}
+	shiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, isGauntlet, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	{
+		if (off) candie = true;
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+	}
 	~shiftedtimedGame(){}
 	//shiftedGame components
 	void insertcharacter(char) override;
@@ -513,6 +581,23 @@ public:
 	hardshiftedtimedGame(): game(){}
 	hardshiftedtimedGame(std::string answer, int charShift, int allowedtime): game(answer), shift(charShift), remainingtime(allowedtime), maxtime(allowedtime){fixedcharacters.resize(getlength());}
 	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
+	{
+		if (off) candie = true;
+		if (result() != 0)
+		{
+			flipstate();
+			permanentturnoff();
+		}
+		fixedcharacters.resize(getlength(), false);
+		if (turn == 0) return;
+		std::string lastanswered = getguess(turn - 1);
+		for (int i = 0; i < getlength(); i++)
+		{
+			if (getresultstate(turn - 1, i) == 2) fixedcharacters[i] = true;
+			else if (getresultstate(turn - 1, i) == 1) neededcharacters[lastanswered[i]]++;
+		}
+	}
+	hardshiftedtimedGame(std::string answer, std::vector <std::string> guesses, bool started, bool off, bool isGauntlet, int turns, int charShift, int allowedtime, int remaintime): game(answer, guesses, started, off, isGauntlet, turns), shift(charShift), maxtime(allowedtime), remainingtime(remaintime)
 	{
 		if (off) candie = true;
 		if (result() != 0)
@@ -617,4 +702,11 @@ public:
 	void draw(game*, sf::RenderWindow&);
 	void drawstate(game*, sf::RenderWindow&, int);
 	void drawmessage(game*, sf::RenderWindow&);
+};
+
+class gauntlet
+{
+public:
+	gauntlet();
+
 };
