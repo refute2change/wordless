@@ -245,7 +245,7 @@ const void game::flipstate()
 //result fetch
 const int game::result()
 {
-	if (turn == 0) return 0;
+	if (!(begin || begintosave)) return 0;
 	for (int i = 0; i < turn; i++)
 	{
 		if (guesses[i] == answer) return 1;
@@ -283,6 +283,7 @@ std::string game::getanswer()
 //state button check
 const bool game::isHit(sf::RenderWindow& w)
 {
+	if (!accessible) return false;
 	if (!sf::Mouse::isButtonPressed(sf::Mouse::Button::Left)) return false;
 	int x = sf::Mouse::getPosition(w).x, y = sf::Mouse::getPosition(w).y;
 	return (x >= gameblock.getPosition().x && y >= gameblock.getPosition().y && x < gameblock.getPosition().x + gameblock.getSize().x && y < gameblock.getPosition().y + gameblock.getSize().y);
@@ -435,6 +436,14 @@ void drawer::drawkeyboard(game* g, sf::RenderWindow& w)
 
 void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 {
+	if (!g->isaccessible()) return;
+	if (g->isGauntlet())
+	{
+		gameblock->setTexture(*gamefailed);
+		gameblock->setScale(sf::Vector2f(1.0, 1.0));
+		gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
+		w.draw(*gameblock);
+	}
 	std::string temp;
 	// std::string temp = std::to_string(g->getremainingtime());
 	// std::string temp = std::to_string(g->exitisdeath());
@@ -448,6 +457,11 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	text->setPosition({(float)898, (float)(187 + 100 * (g->getlength() - 3))});
 	if (g->getmaxtime() != 0)
 	{
+		temp = std::to_string(g->getmaxtime());
+		text->setString(temp);
+		text->setCharacterSize(45);
+		text->setOrigin(text->getLocalBounds().getCenter());
+		text->setPosition({(float)898, (float)(187 + 100 * (g->getlength() - 3))});
 		gameblock->setTexture(*gamefailed);
 		gameblock->setScale(sf::Vector2f(1.0, 1.0));
 		gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
@@ -726,7 +740,7 @@ void timedGame::quit()
 	if (begin && result() == 0)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		startstall = clock();
+		if (active) startstall = clock();
 	}
 }
 
@@ -913,7 +927,7 @@ void hardtimedGame::quit()
 	if (begin && result() == 0)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		startstall = clock();
+		if (active) startstall = clock();
 	}
 }
 
@@ -1009,7 +1023,7 @@ void shiftedtimedGame::quit()
 	if (begin && result() == 0)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		startstall = clock();
+		if (active) startstall = clock();
 	}
 }
 
@@ -1157,7 +1171,7 @@ void hardshiftedtimedGame::quit()
 	if (begin && result() == 0)
 	{
 		remainingtime = (int)(remainingtime * .75);
-		startstall = clock();
+		if (active) startstall = clock();
 	}
 }
 

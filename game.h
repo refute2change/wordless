@@ -80,6 +80,18 @@ public:
 		messagetype = 0;
 	}
 	virtual int getShift() = 0;
+	bool isaccessible()
+	{
+		return accessible;
+	}
+	void setaccessible()
+	{
+		accessible = true;
+	}
+	void setinaccessible()
+	{
+		accessible = false;
+	}
 	bool isGauntlet()
 	{
 		return gauntlet;

@@ -188,9 +188,11 @@ void interface::operate()
 				else if (textEntered->unicode == 8) gamez[active]->removecharacter();
 				else if ((textEntered->unicode >= 'A' && textEntered->unicode <= 'Z') || (textEntered->unicode >= 'a' && textEntered->unicode <= 'z'))
 				{
+					if (gamez[active]->isGauntlet() && !(gamez[active]->begin || gamez[active]->begintosave)) activategauntlet(gamez[active]);
 					if (gamez[active]->result() != 0) break;
 					if (textEntered->unicode >= 'A' && textEntered->unicode <= 'Z') gamez[active]->insertcharacter(textEntered->unicode + 32);
 					else gamez[active]->insertcharacter(textEntered->unicode);
+					
 				}
 			}
 			else if (const auto* mouseButtonPressed = event->getIf<sf::Event::MouseButtonPressed>())
@@ -268,6 +270,10 @@ void interface::operate()
 		// }
 		if (gamez.size() != 0) gamez[active]->updateremainingtime();
 		for (int i = 0; i < gamez.size(); i++) gamez[i]->updatestall();
+		if (isInGauntlet)
+		{
+			if (gamez[active]->result() != 0) deactivategauntlet();
+		}
 		w.clear();
 		draw();
 		resign();
@@ -345,6 +351,7 @@ void interface::resign()
 	{
 		resigned = true;
 		for (game* i: gamez) i->permanentturnoff();
+		if (isInGauntlet) deactivategauntlet();
 		std::cout << "RESIGNED\n";
 	}
 }
@@ -541,4 +548,20 @@ void interface::savegame()
 		}
 	}
 	history.close();
+}
+
+void interface::activategauntlet(game* gauntlet)
+{
+	for (game* i: gamez)
+	{
+		if (gauntlet == i) i->setaccessible();
+		else i->setinaccessible();
+	}
+	isInGauntlet = true;
+}
+
+void interface::deactivategauntlet()
+{
+	for (game* i: gamez) i->setaccessible();
+	isInGauntlet = false;
 }

@@ -23,13 +23,15 @@ private:
 	std::vector<game*> gamez;
 	int firstlost = 0, readavailable;
 	bool resignavailable = true, resigned = false, detention = false, messageavailable = false;
-	bool resetavailable = false, finished = false, typeable = true, informavailable = false, focus = true;
+	bool resetavailable = false, finished = false, typeable = true, informavailable = false, focus = true, isInGauntlet = false;
 	resultHandler handler;
 public:
 	void readgame();
 	interface();
 	void generate();
 	void operate();
+	void activategauntlet(game*);
+	void deactivategauntlet();
 	void draw();
 	int finalresult();
 	bool resignhit();
