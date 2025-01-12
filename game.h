@@ -28,7 +28,7 @@ private:
 	bool accessible = true, gauntlet = false;
 public:
 	int turn = 0;
-	bool begin = false, begintosave = false;
+	bool begin = false, begintosave = false, resigned = false;
 	bool switchedoff = false;
 	game();
 	game(std::string);
@@ -146,6 +146,7 @@ public:
 	std::string getanswer();
 	virtual bool exitisdeath()
 	{
+		if (isGauntlet() && begin) return true;
 		return false;
 	}
 	virtual void setShift(int)
@@ -153,6 +154,7 @@ public:
 
 	}
 	const bool isHit(sf::RenderWindow&);
+	void resign();
 };
 
 class normalGame: virtual public game
@@ -265,6 +267,7 @@ public:
 	void updateremainingtime() override;
 	bool exitisdeath() override
 	{
+		if (isGauntlet() && begin) return true;
 		return candie;
 	}
 	int getremainingtime() override
@@ -437,6 +440,7 @@ public:
 	//timedGame components
 	bool exitisdeath() override
 	{
+		if (isGauntlet() && begin) return true;
 		return candie;
 	}
 	void updateremainingtime() override;
@@ -539,6 +543,7 @@ public:
 	//timedGame components
 	bool exitisdeath() override
 	{
+		if (isGauntlet() && begin) return true;
 		return candie;
 	}
 	int getremainingstall() override
@@ -642,6 +647,7 @@ public:
 	//timedGame components
 	bool exitisdeath() override
 	{
+		if (isGauntlet() && begin) return true;
 		return candie;
 	}
 	int getremainingstall() override

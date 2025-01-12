@@ -45,7 +45,7 @@ interface::interface()
 
 void interface::readgame()
 {
-	bool started, switchedoff;
+	bool started, switchedoff, isGauntlet;
 	int turns, mode, shift, allowedtime, remainingtime;
 	game* gamePtr = nullptr;
 	std::ifstream history("C:/Wordless/unfinishedgame.txt");
@@ -71,7 +71,7 @@ void interface::readgame()
 		else if (mode == 4 || mode == 5) history >> allowedtime >> remainingtime;
 		else if (mode == 6 || mode == 7) history >> shift >> allowedtime >> remainingtime;
 		modes.push_back(mode);
-		history >> started >> switchedoff >> turns;
+		history >> started >> switchedoff >> isGauntlet >> turns;
 		std::getline(history, temp);
 		std::getline(history, temp);
 		previousanswers.clear();
@@ -80,28 +80,28 @@ void interface::readgame()
 			std::getline(history, inputstrings);
 			previousanswers.push_back(inputstrings);
 		}
-		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, switchedoff, turns);
-		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, switchedoff, turns);
-		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, switchedoff, turns, shift);
-		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, switchedoff, turns, shift);
+		if (modes[i] == 0) gamePtr = new normalGame(temp, previousanswers, started, switchedoff, isGauntlet, turns);
+		else if (modes[i] == 1) gamePtr = new hardGame(temp, previousanswers, started, switchedoff, isGauntlet, turns);
+		else if (modes[i] == 2) gamePtr = new shiftedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, shift);
+		else if (modes[i] == 3) gamePtr = new hardshiftedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, shift);
 		else if (modes[i] == 4) 
 		{
-			gamePtr = new timedGame(temp, previousanswers, started, switchedoff, turns, allowedtime, remainingtime);
+			gamePtr = new timedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 5)
 		{
-			gamePtr = new hardtimedGame(temp, previousanswers, started, switchedoff, turns, allowedtime, remainingtime);
+			gamePtr = new hardtimedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 6)
 		{
-			gamePtr = new shiftedtimedGame(temp, previousanswers, started, switchedoff, turns, shift, allowedtime, remainingtime);
+			gamePtr = new shiftedtimedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, shift, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		else if (modes[i] == 7)
 		{
-			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, switchedoff, turns, shift, allowedtime, remainingtime);
+			gamePtr = new hardshiftedtimedGame(temp, previousanswers, started, switchedoff, isGauntlet, turns, shift, allowedtime, remainingtime);
 			gamePtr->begin = false;
 		}
 		// gamePtr = new normalGame(temp, previousanswers, started, turns);
@@ -220,54 +220,6 @@ void interface::operate()
 			else if (event->is<sf::Event::FocusLost>()) focus = false;
 			else if (event->is<sf::Event::FocusGained>()) focus = true;
         }
-		// while (w.pollEvent(ev))
-		// {
-		// 	switch (ev.type)
-		// 	{
-		// 	case sf::Event::Closed:
-		// 		w.close();
-		// 		break;
-		// 	case sf::Event::TextEntered:
-		// 		if (!typeable) break;
-		// 		if (gamez.size() == 0) break;
-		// 		else if (ev.text.unicode == 13) gamez[active]->enterevent();
-		// 		else if (ev.text.unicode == 8) gamez[active]->removecharacter();
-		// 		else if ((ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') || (ev.text.unicode >= 'a' && ev.text.unicode <= 'z'))
-		// 		{
-		// 			if (gamez[active]->result() != 0) break;
-		// 			if (ev.text.unicode >= 'A' && ev.text.unicode <= 'Z') gamez[active]->insertcharacter(ev.text.unicode + 32);
-		// 			else gamez[active]->insertcharacter(ev.text.unicode);
-		// 		}
-		// 		break;
-		// 	case sf::Event::MouseButtonPressed:
-		// 		if (!focus) break;
-		// 		if (messageavailable) messageavailable = false;
-		// 		else if (informhit()) messageavailable = true;
-		// 		if (gamez.size())
-		// 		{
-		// 			if (gamez[active]->messagestate()) gamez[active]->hidemessage(); //***
-		// 			for (int i = 0; i < 6; i++)
-		// 			{
-		// 				if (gamez[i]->isHit(w))
-		// 				{
-		// 					if (active == i) continue;
-		// 					gamez[active]->turnofftimer();
-		// 					gamez[active]->quit();
-		// 					gamez[i]->turnontimer();
-		// 					gamez[i]->turnoffstall();
-		// 					active = i;
-		// 				}
-		// 			}
-		// 		}
-		// 		break;
-		// 	case sf::Event::GainedFocus:
-		// 		focus = true;
-		// 		break;
-		// 	case sf::Event::LostFocus:
-		// 		focus = false;
-		// 		break;
-		// 	}
-		// }
 		if (gamez.size() != 0) gamez[active]->updateremainingtime();
 		for (int i = 0; i < gamez.size(); i++) gamez[i]->updatestall();
 		if (isInGauntlet)
@@ -350,7 +302,11 @@ void interface::resign()
 	if (resignhit())
 	{
 		resigned = true;
-		for (game* i: gamez) i->permanentturnoff();
+		for (game* i: gamez)
+		{
+			if (i->result() == 0) i->resigned = true;
+			i->permanentturnoff();
+		}
 		if (isInGauntlet) deactivategauntlet();
 		std::cout << "RESIGNED\n";
 	}
@@ -537,7 +493,7 @@ void interface::savegame()
 			else if (modes[i] == 5) history << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 6) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
 			else if (modes[i] == 7) history << " " << gamez[i]->getShift() << "\n" << gamez[i]->getmaxtime() << " " << gamez[i]->getremainingtime() << '\n';
-			history << (gamez[i]->begin || gamez[i]->begintosave) << " " << gamez[i]->switchedoff << '\n';
+			history << (gamez[i]->begin || gamez[i]->begintosave) << " " << gamez[i]->switchedoff << " " << gamez[i]->isGauntlet() << '\n';
 			history << gamez[i]->turn << '\n';
 			history << gamez[i]->getanswer() << '\n';
 			std::vector<std::string> answers = gamez[i]->getanswers();
