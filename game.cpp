@@ -447,7 +447,7 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	if (!g->isaccessible()) return;
 	std::string temp;
 	// std::string temp = std::to_string(g->getremainingtime());
-	// std::string temp = std::to_string(g->exitisdeath());
+	// temp = std::to_string(g->isGauntlet());
 	if (g->result() == 0) temp = std::to_string(g->getlength()) + " letters";
 	else temp = g->getanswer();
 	if (atgame == g->getlength() - 3) text->setFont(font);
@@ -457,21 +457,12 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	else text->setCharacterSize(40);
 	text->setOrigin(text->getLocalBounds().getCenter());
 	text->setPosition({(float)898, (float)(187 + 100 * (g->getlength() - 3))});
-	if (g->isGauntlet())
-	{
-		gameblock->setTexture(*gamefailed);
-		gameblock->setScale(sf::Vector2f(1.0, 1.0));
-		gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
-		w.draw(*gameblock);
-	}
-	if (g->getmaxtime() != 0)
-	{
-		gameblock->setTexture(*gamefailed);
-		gameblock->setScale(sf::Vector2f(1.0, 1.0));
-		gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
-		w.draw(*gameblock);
-	}
 	
+	gameblock->setTexture(*gamefailed);
+	gameblock->setScale(sf::Vector2f(1.0, 1.0));
+	gameblock->setTextureRect(sf::IntRect({0, 0}, {int(gameblock->getTexture().getSize().x), int(gameblock->getTexture().getSize().y)}));
+	gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
+	w.draw(*gameblock);
 	if (atgame == g->getlength() - 3 && g->result() == 0) gameblock->setTexture(*gameactive);
 	else if (!g->result()) gameblock->setTexture(*gamenotstarted);
 	else if (g->result() == -1) gameblock->setTexture(*gamefailed);
@@ -480,13 +471,13 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 	{
 		float scale = (float)g->getremainingtime() / g->getmaxtime();
 		//gameblock.setScale(sf::Vector2f(scale, 1.0f));
-		gameblock->setTextureRect(sf::IntRect({0, 0}, {float(scale * gameblock->getTexture().getSize().x), float(gameblock->getTexture().getSize().y)}));
+		gameblock->setTextureRect(sf::IntRect({0, 0}, {int(scale * gameblock->getTexture().getSize().x), int(gameblock->getTexture().getSize().y)}));
 		gameblock->setPosition({(float)810, float(150 + 100 * (g->getlength() - 3))});
 	}
 	else
 	{
 		// gameblock.setScale(sf::Vector2f(1.0, 1.0));
-		gameblock->setTextureRect(sf::IntRect({0, 0}, {float(gameblock->getTexture().getSize().x), float(gameblock->getTexture().getSize().y)}));
+		gameblock->setTextureRect(sf::IntRect({0, 0}, {int(gameblock->getTexture().getSize().x), int(gameblock->getTexture().getSize().y)}));
 		gameblock->setPosition({(float)810, (float)(150 + 100 * (g->getlength() - 3))});
 	}
 	w.draw(*gameblock);
@@ -495,7 +486,7 @@ void drawer::drawstate(game* g, sf::RenderWindow& w, int atgame)
 		float scale = (float)g->getremainingstall() / (15 * CLOCKS_PER_SEC);
 		gameblock->setTexture(*gamestall);
 		// gameblock.setScale(sf::Vector2f(scale, 1.0f));
-		gameblock->setTextureRect(sf::IntRect({0, 0}, {scale * gameblock->getTexture().getSize().x, float(gameblock->getTexture().getSize().y)}));
+		gameblock->setTextureRect(sf::IntRect({0, 0}, {int(scale * gameblock->getTexture().getSize().x), int(gameblock->getTexture().getSize().y)}));
 		gameblock->setPosition({(float)810, float(150 + 100 * (g->getlength() - 3))});
 		w.draw(*gameblock);
 	}
@@ -523,7 +514,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 		}
 		if (!g->messagestate()) return;
 		message->setTexture(*this->notvalidguess);
-		message->setTextureRect(sf::IntRect({0, 0}, {float(notvalidguess->getSize().x), float(notvalidguess->getSize().y)}));
+		message->setTextureRect(sf::IntRect({0, 0}, {int(notvalidguess->getSize().x), int(notvalidguess->getSize().y)}));
 		message->setPosition({200., 265.});
 		w.draw(*this->message);
 		break;
@@ -545,7 +536,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 		}
 		if (!g->messagestate()) return;
 		message->setTexture(*this->alreadyguessed);
-		message->setTextureRect(sf::IntRect({0, 0}, {float(alreadyguessed->getSize().x), float(alreadyguessed->getSize().y)}));
+		message->setTextureRect(sf::IntRect({0, 0}, {int(alreadyguessed->getSize().x), int(alreadyguessed->getSize().y)}));
 		message->setPosition({200., 265.});
 		w.draw(*this->message);
 		break;
@@ -553,7 +544,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 		if (g->messagestate())
 		{
 			message->setTexture(*this->winmessage);
-			message->setTextureRect(sf::IntRect({0, 0}, {float(winmessage->getSize().x), float(winmessage->getSize().y)}));
+			message->setTextureRect(sf::IntRect({0, 0}, {int(winmessage->getSize().x), int(winmessage->getSize().y)}));
 			text->setFont(this->font);
 			text->setString(g->getdisplaystring());
 			text->setCharacterSize(45);
@@ -568,7 +559,7 @@ void drawer::drawmessage(game* g, sf::RenderWindow& w)
 		if (g->messagestate())
 		{
 			message->setTexture(*this->lostmessage);
-			message->setTextureRect(sf::IntRect({0, 0}, {float(lostmessage->getSize().x), float(lostmessage->getSize().y)}));
+			message->setTextureRect(sf::IntRect({0, 0}, {int(lostmessage->getSize().x), int(lostmessage->getSize().y)}));
 			text->setFont(this->font);
 			text->setString(g->getdisplaystring());
 			text->setCharacterSize(45);
